@@ -1,0 +1,143 @@
+---
+import Arrow from './Arrow.astro';
+import ServiceVisual from './ServiceVisual.astro';
+import '../styles/site.css';
+import '../styles/production.css';
+interface Props { variant?: 'cabinet' | 'general'; }
+const { variant = 'cabinet' } = Astro.props;
+const services = [
+  { number: '01', title: 'Una presencia que abre puertas.', label: 'Presencia digital', description: 'Diseñamos sitios web y desarrollamos estrategias de marketing para que tu empresa se presente con claridad y llegue a las personas adecuadas.', tags: ['Diseño y desarrollo web', 'Marketing y presencia digital'], type: 'web' },
+  { number: '02', title: 'Más atención. Menos tareas repetitivas.', label: 'Automatización e IA', description: 'Conectamos agentes de IA con tus canales de atención y tu CRM para responder consultas y dar continuidad a cada conversación.', tags: ['WhatsApp y chatbots', 'Agentes de voz', 'Integraciones con CRM'], type: 'flow' },
+  { number: '03', title: 'Del mundo físico a tu sistema.', label: 'Digitalización e integración', description: 'Convertimos documentos en datos utilizables con OCR y conectamos experiencias físicas con servicios digitales mediante tarjetas NFC.', tags: ['OCR y procesamiento de documentos', 'Tarjetas NFC', 'Integraciones a medida'], type: 'data' },
+];
+---
+<!doctype html>
+<html lang="es" data-type={variant}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Canario Studios. Transformación digital: diseño web, marketing, agentes de IA, automatización de CRM, OCR y tarjetas NFC desde El Salvador." />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:title" content="Canario Studios · Transformación digital" />
+    <meta property="og:description" content="Diseño web, presencia digital y sistemas conectados. Ingeniería e inteligencia artificial para el próximo paso de tu empresa." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_SV" />
+    <link rel="icon" href="data:," />
+    <link rel="preload" href={variant === 'cabinet' ? '/fonts/cabinet-grotesk.woff2' : '/fonts/general-sans.woff2'} as="font" type="font/woff2" crossorigin />
+    <title>Canario Studios · Transformación digital</title>
+    <script is:inline>
+      try {
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches && !sessionStorage.getItem('canario-intro') && !location.hash) {
+          document.documentElement.classList.add('intro-active');
+          sessionStorage.setItem('canario-intro', 'seen');
+          setTimeout(() => document.documentElement.classList.remove('intro-active'), 1400);
+          for (const event of ['pointerdown', 'keydown', 'wheel']) addEventListener(event, () => document.documentElement.classList.remove('intro-active'), { once: true, passive: true });
+        }
+      } catch { /* The content remains visible when storage is unavailable. */ }
+    </script>
+  </head>
+  <body>
+    <div class="brand-intro" aria-hidden="true"><span class="intro-wordmark">canario<br />studios</span></div>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <header class="site-header">
+      <a class="wordmark" href="#inicio" aria-label="Canario Studios, inicio">canario<span>studios</span></a>
+      <nav aria-label="Navegación principal">
+        <a href="#capacidades">Qué hacemos</a>
+        <a href="#estudio">El estudio</a>
+      </nav>
+      <a class="header-contact" href="mailto:german@dueber.dev?subject=Hablemos%20de%20mi%20proyecto%20%7C%20Canario%20Studios">Hablemos <Arrow diagonal /></a>
+    </header>
+    <main id="contenido">
+      <section class="hero" id="inicio" aria-labelledby="hero-title">
+        <div class="hero-media" aria-hidden="true">
+          <picture>
+            <source media="(max-width: 680px)" srcset="/media/canario-mobile-poster.webp" />
+            <img src="/media/canario-poster.webp" alt="" width="1920" height="1080" fetchpriority="high" />
+          </picture>
+          <video id="canario-video" muted playsinline loop preload="none" tabindex="-1" data-desktop="/media/canario-desktop.mp4" data-mobile="/media/canario-mobile.mp4"></video>
+        </div>
+        <div class="hero-heading">
+          <p class="eyebrow"><span class="small-line" aria-hidden="true"></span> Estudio de transformación digital</p>
+          <h1 id="hero-title">canario<br />studios</h1>
+        </div>
+        <div class="hero-description">
+          <p>Conectamos lo que tu negocio es<br class="desktop-break" /> con todo lo que puede ser.</p>
+          <a class="round-link" href="#capacidades"><span>Descubre cómo</span><span class="circle-arrow"><Arrow /></span></a>
+        </div>
+        <div class="media-controls" hidden>
+          <button id="sound-toggle" type="button" aria-pressed="false" aria-controls="canario-video">
+            <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span data-sound-label>Escucha este momento</span>
+          </button>
+          <button id="video-toggle" class="video-toggle" type="button" aria-label="Pausar video" aria-controls="canario-video"><span data-pause-icon data-state="playing" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path class="pause-symbol" d="M5 3v10M11 3v10" stroke="currentColor" stroke-width="1.5" /><path class="play-symbol" d="m4 2 9 6-9 6Z" stroke="currentColor" stroke-width="1.3" /></svg></span></button>
+        </div>
+        <span class="cursor-sound" aria-hidden="true"><span class="cursor-sound-dot"></span><span data-cursor-label>Haz clic para activar sonido</span></span>
+        <span id="media-status" class="sr-only" role="status" aria-live="polite"></span>
+      </section>
+
+      <div class="hero-caption"><span>Ideas claras. Tecnología que las hace posibles.</span><span>Desde El Salvador, con visión global <span aria-hidden="true">↗</span></span></div>
+
+      <section class="introduction section-pad" id="capacidades" aria-labelledby="intro-title">
+        <p class="eyebrow section-label"><span class="index-number">01 /</span> Qué hacemos</p>
+        <div class="introduction-copy">
+          <h2 id="intro-title">Tu próximo paso.<br /><span class="muted">Todo conectado.</span></h2>
+          <p>Diseñamos e integramos la tecnología que tu empresa necesita para avanzar, desde su presencia digital hasta la forma en que atiende a sus clientes y trabaja cada día.</p>
+        </div>
+      </section>
+      <section class="journey" aria-label="Nuestras capacidades">
+        <div class="journey-top section-pad">
+          <p class="eyebrow">Lo que podemos construir contigo</p>
+          <div class="journey-navigation" role="group" aria-label="Escenas de servicios" hidden>
+            {services.map((service, index) => <button type="button" data-scene={index} aria-label={`Ver ${service.label}`} aria-current={index === 0 ? 'step' : undefined}>{service.number}<span>{service.label}</span></button>)}
+          </div>
+          <a class="journey-skip" href="#trabajo">Continuar al trabajo <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v14m-5-5 5 5 5-5" fill="none" stroke="currentColor" /></svg></a>
+        </div>
+        <div class="flight-guide" aria-hidden="true"><div class="flight-line"></div><svg class="journey-bird" viewBox="0 0 90 50" width="60" height="34"><path d="M4 34 26 27Q31 21 39 23L28 5Q46 12 54 23Q62 14 70 20L73 24 85 28 72 31Q64 41 49 34L23 42 30 32Z" fill="currentColor" /></svg></div>
+        <div class="journey-window"><div class="services section-pad">
+        {services.map(service => (
+          <article class="service" data-service={service.type}>
+            <div class="service-copy">
+            <div class="service-top"><span class="service-number">{service.number}</span><span class="eyebrow">{service.label}</span><Arrow diagonal /></div>
+            <h3>{service.title}</h3>
+            <p>{service.description}</p>
+            <ul>{service.tags.map(tag => <li>{tag}</li>)}</ul>
+            </div>
+            <ServiceVisual type={service.type} />
+          </article>
+        ))}
+        </div></div>
+        <div class="journey-bottom section-pad" aria-hidden="true"><span>Tres áreas. Una misma visión.</span><span data-journey-count>01 / 03</span></div>
+      </section>
+
+      <section class="work section-pad" id="trabajo" aria-labelledby="work-title">
+        <div class="section-heading"><p class="eyebrow"><span class="index-number">02 /</span> Trabajo seleccionado</p><p>Una muestra de cómo pensamos y construimos.</p></div>
+        <a class="project" href="https://dueber.dev/es/" target="_blank" rel="noopener noreferrer" aria-label="Visitar Dueber, proyecto personal de Luis German Dueñas, abre en otra pestaña">
+          <div class="project-visual"><span class="project-domain">dueber.dev</span><div class="project-type" aria-hidden="true">dueber<span>↗</span></div><span class="project-visual-note">Diseño y desarrollo web personal</span><span class="project-open"><Arrow diagonal /></span></div>
+          <div class="project-info"><h2 id="work-title">Dueber</h2><p>Proyecto personal de Luis German Dueñas, cofundador de Canario Studios.</p><span>Explorar proyecto <Arrow diagonal /></span></div>
+        </a>
+      </section>
+
+      <section class="studio section-pad" id="estudio" aria-labelledby="studio-title">
+        <p class="eyebrow section-label"><span class="index-number">03 /</span> El estudio</p>
+        <div class="studio-body"><h2 id="studio-title">Criterio para diseñar.<br /><span class="muted">Ingeniería para construir.</span></h2>
+        <p>Somos un estudio de transformación digital fundado en El Salvador. Combinamos diseño y desarrollo con automatización e inteligencia artificial para resolver necesidades concretas de cada empresa.</p>
+        <div class="founders"><span>Luis German Dueñas Bernal</span><span>Miguel Orlando Ledezma Arévalo</span><span>Javier Ernesto Morán Rosales</span></div>
+        <p class="education">Cofundadores. Estudiantes de Ingeniería y Ciencias de la Computación en Key Institute.</p></div>
+      </section>
+
+      <section class="contact section-pad" id="contacto" aria-labelledby="contact-title">
+        <p class="eyebrow"><span class="index-number">04 /</span> El siguiente paso</p>
+        <h2 id="contact-title">Las buenas ideas<br />empiezan hablando<span>.</span></h2>
+        <p>Cuéntanos qué quieres mejorar en tu empresa.<br />Encontraremos juntos por dónde empezar.</p>
+        <a class="contact-email" href="mailto:german@dueber.dev?subject=Hablemos%20de%20mi%20proyecto%20%7C%20Canario%20Studios">german@dueber.dev <Arrow diagonal /></a>
+      </section>
+    </main>
+    <footer class="site-footer"><a class="wordmark" href="#inicio">canario<span>studios</span></a><span>El Salvador · {new Date().getFullYear()}</span><a href="#inicio">Volver al inicio ↑</a></footer>
+    <button class="ambient-toggle" type="button" aria-pressed="false" hidden><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span data-ambient-label>Activar sonido</span></button>
+    <audio id="background-music" preload="none" loop data-src="/media/cylinder-six.m4a"></audio>
+    <aside class="music-credit" aria-label="Créditos musicales">Música: <a href="https://chriszabriskie.com/cylinders/" target="_blank" rel="noopener noreferrer">«Cylinder Six», Chris Zabriskie</a>. <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>. Volumen adaptado para este sitio.</aside>
+    <script src="../scripts/hero.ts"></script>
+    <script src="../scripts/motion.ts"></script>
+  </body>
+</html>

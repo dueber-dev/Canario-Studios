@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.cache/
+verification/*.png
+verification/*.json
+*.log
+.env
+.env.*
+!.env.example

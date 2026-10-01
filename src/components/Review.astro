@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex,nofollow" /><link rel="icon" href="data:," /><title>Canario Studios · Revisión de composición</title></head>
+  <body>
+    <header>
+      <div class="review-title"><strong>Canario / Revisión 01</strong><span>Composición y tipografía</span></div>
+      <div class="options" role="group" aria-label="Tipografía"><button data-variant="a" aria-pressed="true">A · Cabinet + Switzer</button><button data-variant="b" aria-pressed="false">B · General Sans</button></div>
+      <div class="options" role="group" aria-label="Vista"><button data-size="desktop" aria-pressed="true">Escritorio</button><button data-size="mobile" aria-pressed="false">Móvil</button></div>
+      <a id="open-design" href="/" target="_blank" rel="noopener">Abrir diseño ↗</a>
+    </header>
+    <div class="review-note">Opción A aprobada. Comparador conservado para referencia; el sitio principal incluye movimiento y sonido opcional. Contacto provisional: german@dueber.dev.</div>
+    <main><iframe title="Vista previa de Canario Studios" src="/" allow="autoplay" id="design-frame"></iframe></main>
+    <script>
+      const frame = document.querySelector<HTMLIFrameElement>('#design-frame')!;
+      const open = document.querySelector<HTMLAnchorElement>('#open-design')!;
+      document.querySelectorAll<HTMLButtonElement>('[data-variant]').forEach(button => button.addEventListener('click', () => {
+        document.querySelectorAll('[data-variant]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+        frame.src = button.dataset.variant === 'b' ? '/opcion-b' : '/';
+        open.href = frame.src;
+      }));
+      document.querySelectorAll<HTMLButtonElement>('[data-size]').forEach(button => button.addEventListener('click', () => {
+        document.querySelectorAll('[data-size]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+        frame.classList.toggle('mobile', button.dataset.size === 'mobile');
+      }));
+    </script>
+    <style>
+      @font-face {font-family:Switzer;src:url('/fonts/switzer.woff2') format('woff2');font-weight:100 900;font-display:swap}
+      *{box-sizing:border-box}body{margin:0;font:12px Switzer,Arial,sans-serif;color:#172323;background:#ededeb}header{min-height:70px;padding:12px 24px;display:flex;align-items:center;gap:24px;background:white;border-bottom:1px solid #ddd}.review-title{display:grid;gap:4px;margin-right:auto}.review-title strong{font-size:14px}.review-title span{color:#69706b}.options{display:flex;gap:4px}button{font:inherit;cursor:pointer;border:1px solid #d4d8d4;border-radius:4px;padding:10px 12px;background:white;white-space:nowrap}button[aria-pressed=true]{background:#172323;border-color:#172323;color:white}a{color:inherit;text-decoration:none;white-space:nowrap}.review-note{padding:9px 24px;background:#f6f6f3;border-bottom:1px solid #ddd;font-size:11px;color:#58605a}main{height:calc(100dvh - 106px);display:flex;justify-content:center;padding:0 12px}iframe{border:0;background:white;width:100%;height:100%;box-shadow:0 0 0 1px #ddd}iframe.mobile{width:390px;max-width:100%}:focus-visible{outline:2px solid #3556bc;outline-offset:3px}@media(max-width:1000px){header{flex-wrap:wrap;gap:10px;padding:10px 12px}.review-title{width:100%;margin:0}.review-note{padding:8px 12px}main{height:calc(100dvh - 180px)}button{padding:8px}header>a{margin-left:auto}}@media(prefers-reduced-motion:no-preference){iframe{transition:width .25s ease}}
+    </style>
+  </body>
+</html>

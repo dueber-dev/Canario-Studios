@@ -1,0 +1,15 @@
+# Key frames para el hero de Canario Studios
+
+Generados con la herramienta integrada de imágenes de Codex, sin usar créditos de Higgsfield. Estas imágenes son referencias visuales, no fotogramas finales de un video continuo.
+
+## 01 — Escultura de vacío
+
+> Use case: stylized-concept. Asset type: one key frame for a high-end interactive landing page hero film. A monumental near-black sculptural block in a vast dark studio, with several clean apertures cut through it. Seen from a precise three-quarter camera angle, those voids are JUST beginning to align into one continuous opening, revealing a narrow warm-white beam through the depth of the object. The visual idea is that a hidden path becomes visible through a change in perspective. Exquisitely restrained contemporary art direction, photoreal 3D cinema still, smoked basalt and satin ceramic surfaces with tactile microtexture, deep shadow, subtle volumetric light. Wide 16:9 landscape composition, object in central-right area, generous clean negative space at left for eventual website copy. Sophisticated and original, no bird, no logo, no mining, no UI, no text, no symbols, no watermark.
+
+## 03 — Cartografía viva
+
+> Use case: stylized-concept. Asset type: one key frame for a high-end interactive landing page hero film. An abstract living topographic landscape viewed from a low aerial oblique camera angle: hundreds of fine, meticulously sculpted contour layers in pale stone and smoked glass rise and fall like terrain. At the center, the contours reorganize to reveal one elegant continuous route cut through the landform; the movement is implied in the frozen key frame. Nature translated into precise design, premium gallery installation, tactile physical materials, cinematic dark forest-green atmosphere with carefully controlled warm-white side lighting and a small restrained amber accent. Wide 16:9 landscape composition, main landform across lower and right portions, calm negative space upper left for eventual website copy. Distinctive and art-directed, no literal map labels, no bird, no logo, no UI, no text, no watermark.
+
+## 09 — Archivo en movimiento
+
+> Use case: stylized-concept. Asset type: one key frame for a high-end interactive landing page hero film. An immense archive of hundreds of ultra-thin translucent glass and vellum sheets floating in a dark architectural void, caught mid-motion as they rotate and align to form one lucid corridor of light through their center. Camera at human eye level, looking diagonally through layered depth; exquisite parallax and physical suspension, slight motion blur only at sheet edges, precise gallery-grade composition. Smoked glass, warm ivory vellum, dark green-black ambient space, one controlled warm amber glint. Wide 16:9 landscape composition, dramatic structure concentrated center-right with calm dark negative space on left for website copy. Sophisticated, surreal yet believable, no writing on sheets, no data graphics, no bird, no logo, no UI, no text, no watermark.
