@@ -41,15 +41,19 @@ function updateControls() {
   for (const button of [soundButton, ambientButton])
     button.setAttribute("aria-pressed", String(soundEnabled));
   soundLabel.textContent = soundEnabled
-    ? "Silenciar este momento"
-    : "Escucha este momento";
-  cursorLabel.textContent = soundEnabled
-    ? "Haz clic para silenciar"
-    : "Haz clic para activar sonido";
-  ambientLabel.textContent = soundEnabled
-    ? "Silenciar ambiente"
+    ? "Silenciar"
     : "Activar sonido";
-  ambientButton.hidden = inView && !soundEnabled;
+  soundButton.setAttribute("aria-label", soundEnabled ? "Silenciar sonido" : "Activar sonido");
+  cursorLabel.textContent = soundEnabled
+    ? "Silenciar"
+    : "Activar sonido";
+  ambientLabel.textContent = soundEnabled
+    ? "Silenciar sonido"
+    : "Activar sonido";
+  ambientButton.setAttribute("aria-label", ambientLabel.textContent);
+  ambientButton.title = ambientLabel.textContent;
+  ambientButton.hidden = false;
+  cursorWidth = cursor.offsetWidth || 190;
 }
 
 async function playVideo() {
@@ -117,6 +121,9 @@ function setSource() {
 }
 
 controls.hidden = false;
+video.disablePictureInPicture = true;
+video.disableRemotePlayback = true;
+video.controls = false;
 setSource();
 updateControls();
 video.addEventListener(

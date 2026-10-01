@@ -15,6 +15,7 @@ npm run preview
 - `/`: sitio principal.
 - `/opcion-b`: opción B, General Sans. Solo desarrollo.
 - `/revision`: comparador de tipografía y escritorio/móvil. Solo desarrollo.
+- `/?intro=1`: repite la introducción al recargar, solo en desarrollo.
 
 Las rutas de revisión no se generan en `dist`. La versión actual tiene `noindex,nofollow`, no dominio configurado y no se ha publicado. El build estático no requiere un servidor de aplicación.
 
@@ -28,6 +29,10 @@ En escritorio con puntero fino, hacer clic sobre el hero activa o silencia el au
 
 El recorrido horizontal se activa desde 1000 px de ancho y 650 px de alto, salvo movimiento reducido. En móvil, ventanas de poca altura, movimiento reducido o sin JavaScript, los servicios se leen verticalmente. La intro tiene salida CSS y temporizador propio para no bloquear el contenido si falla el script principal. Scroll nativo, sin Lenis ni motores redundantes.
 
+La introducción dura 3.2 segundos y puede omitirse con Escape o Tab. El hero empieza ocupando el viewport; una sección sticky permite revelar el marco blanco con scroll nativo. El progreso visual tiene un límite de 0.625 por segundo en ambos sentidos (mínimo 1.6 s para el recorrido completo, más la desaceleración). Un salto de scroll puede dejar atrás el hero; no se captura ni se bloquea el desplazamiento. Movimiento reducido muestra directamente el marco y omite esta transición. El botón de sonido usa Switzer, una cápsula amarilla y un indicador de cuatro barras en la esquina superior derecha.
+
+El video desactiva Picture-in-Picture, reproducción remota y controles nativos. `astro.config.mjs` añade `Permissions-Policy: picture-in-picture=()` en desarrollo y preview. `public/_headers` conserva esa política para hosts estáticos compatibles; al elegir otro proveedor hay que configurar el mismo encabezado en él. No se cambian preferencias del navegador del visitante.
+
 ## Recursos
 
 Fuentes variables descargadas sin modificaciones desde Fontshare. Origen y licencias en `licenses/`. Originales de video conservados en la raíz y `video/`; archivos de web en `public/media/`. Véase `video/README.md` para la procedencia documentada del clip.
@@ -36,7 +41,7 @@ No publicar los archivos de fuentes como biblioteca o paquete para terceros. La 
 
 ## Revisión
 
-Consultar `verification/production-01.md` para las comprobaciones y límites actuales; `verification/review-01.md` conserva la revisión anterior. Los screenshots quedan en `verification/`, fuera del build público.
+Consultar `verification/hero-02.md` para esta revisión del hero y `verification/production-01.md` para la comprobación general anterior. Los screenshots quedan en `verification/`, fuera del build público.
 
 ## Repositorio
 
