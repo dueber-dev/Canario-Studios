@@ -251,30 +251,6 @@ html {
   background: var(--ink);
   color: white;
 }
-.media-controls {
-  position: absolute;
-  right: 30px;
-  bottom: 30px;
-  display: flex;
-  gap: 6px;
-}
-.media-controls button {
-  border: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 11px 15px;
-  border-radius: 30px;
-  background: #ffffffed;
-  font-size: 11px;
-  min-height: 40px;
-}
-.media-controls .video-toggle {
-  width: 40px;
-  padding: 0;
-  font-size: 16px;
-}
 .sound-bars {
   display: flex;
   gap: 2px;
@@ -611,10 +587,6 @@ html {
   .hero-description > p {
     font-size: 17px;
   }
-  .media-controls {
-    right: 18px;
-    bottom: 20px;
-  }
   .introduction,
   .studio {
     grid-template-columns: 1fr 2.2fr;
@@ -713,18 +685,6 @@ html {
   .circle-arrow {
     width: 34px;
     height: 34px;
-  }
-  .media-controls {
-    right: 14px;
-    bottom: 215px;
-  }
-  .media-controls button {
-    font-size: 10px;
-    padding: 10px 12px;
-    min-height: 38px;
-  }
-  .media-controls .video-toggle {
-    width: 38px;
   }
   .hero-caption {
     margin: 0 24px;
@@ -938,9 +898,6 @@ html {
   .hero {
     height: 765px;
   }
-  .media-controls {
-    bottom: 190px;
-  }
 }
 .index-number,
 .service-number {
@@ -949,8 +906,4 @@ html {
 [data-pause-icon] {
   display: grid;
   place-items: center;
-}
-[data-state="playing"] .play-symbol,
-[data-state="paused"] .pause-symbol {
-  display: none;
 }

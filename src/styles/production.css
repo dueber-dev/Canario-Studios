@@ -88,14 +88,6 @@
 .hero.pointer-sound {
   cursor: pointer;
 }
-.hero.pointer-sound .media-controls #sound-toggle {
-  opacity: 0;
-  pointer-events: none;
-}
-.hero.pointer-sound .media-controls #sound-toggle:focus-visible {
-  opacity: 1;
-  pointer-events: auto;
-}
 .ambient-toggle {
   position: fixed;
   bottom: 22px;
