@@ -1,0 +1,8 @@
+---
+import IdentityProof from '../../../components/identity/IdentityProof.astro';
+// Solo desarrollo: la prueba de identidad no se genera en dist.
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { view: undefined } }] : [];
+}
+---
+<IdentityProof />

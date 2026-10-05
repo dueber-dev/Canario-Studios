@@ -1,4 +1,9 @@
 @import "tailwindcss";
+/* El laboratorio de identidad no debe añadir utilidades al sitio público. */
+@source not "./identity";
+@source not "../components/identity";
+@source not "../pages/laboratorio";
+@source not "../scripts/identity-lab.ts";
 
 @font-face {
   font-family: "Cabinet Grotesk";

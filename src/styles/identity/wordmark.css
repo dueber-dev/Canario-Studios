@@ -1,0 +1,49 @@
+/*
+  Wordmark `canario studios` en una línea. El punto de la i de `canario` es el
+  Signal Dot: se dibuja sobre la ı sin punto de Cabinet Grotesk y se posiciona en
+  em sobre la geometría medida de la fuente (UPM 1000, descendente 280).
+  Las variables --wm-* llegan desde la calibración activa ([data-cal]).
+*/
+.wm {
+  display: inline-block;
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: var(--wm-w1);
+  font-kerning: normal;
+  font-synthesis: none;
+  letter-spacing: var(--wm-track);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--fg);
+}
+.wm-studios {
+  margin-left: var(--wm-space);
+  font-weight: var(--wm-w2);
+}
+.wm-i {
+  position: relative;
+}
+.wm-i::after {
+  content: "";
+  position: absolute;
+  left: var(--wm-dot-x);
+  /* El borde inferior de la caja inline está 0.28em bajo la línea base. */
+  bottom: calc(0.28em + var(--wm-dot-y));
+  width: max(var(--wm-dot-w), 2px);
+  height: max(var(--wm-dot-h), 2px);
+  translate: -50% 0;
+  border-radius: var(--wm-dot-r);
+  background: var(--signal);
+}
+.wm-sr,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

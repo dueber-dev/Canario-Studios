@@ -1,0 +1,11 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { CalibrationId } from './calibrations';
+
+interface Props extends HTMLAttributes<'span'> {
+  as?: 'h1' | 'h2' | 'p' | 'span' | 'div';
+  cal?: CalibrationId;
+}
+const { as: Tag = 'span', cal, class: className, ...attrs } = Astro.props;
+---
+<Tag class:list={['wm', className]} data-cal={cal} {...attrs}><span class="wm-sr">canario studios</span><span class="wm-canario" aria-hidden="true">canar<span class="wm-i">ı</span>o</span><span class="wm-studios" aria-hidden="true">studios</span></Tag>

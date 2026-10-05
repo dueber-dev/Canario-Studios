@@ -1,0 +1,171 @@
+/*
+  Canario Studios — identidad, laboratorio 01.
+  Valores candidatos en revisión. La landing pública todavía no los usa.
+*/
+@font-face {
+  font-family: "Cabinet Grotesk";
+  src: url("/fonts/cabinet-grotesk.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Switzer;
+  src: url("/fonts/switzer.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Núcleo. BLACK = observation · CANARY = signal · WARM WHITE = clarity */
+  --c-black: #111210;
+  --c-canary: #f3df16;
+  --c-warm: #f5f3eb;
+  /* Neutrales: solo texto secundario y líneas, uno por superficie. */
+  --c-stone-dark: #8e8c84;
+  --c-stone-light: #67655e;
+  --c-rule-dark: #2e2f2b;
+  --c-rule-light: #d6d3c8;
+
+  --f-display: "Cabinet Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-text: Switzer, "Helvetica Neue", Arial, sans-serif;
+
+  /* Espacio, base 8. */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+  --s-11: 192px;
+
+  /* Grid: 4 columnas en móvil, 8 en tableta, 12 en escritorio. */
+  --g-cols: 4;
+  --g-margin: clamp(20px, 5vw, 80px);
+  --g-gutter: 16px;
+  --rule: 1px;
+
+  /* Escala tipográfica fluida entre 320 y 1440 px. */
+  --t-d1: clamp(44px, 2.4px + 13vw, 152px);
+  --t-d2: clamp(36px, 22px + 4.4vw, 88px);
+  --t-d3: clamp(28px, 20px + 2.5vw, 56px);
+  --t-d4: clamp(22px, 17px + 1.4vw, 34px);
+  --t-lead: clamp(18px, 16px + 0.45vw, 22px);
+  --t-body: clamp(15px, 14px + 0.22vw, 17px);
+  --t-small: 14px;
+  --t-label: 11px;
+  --t-meta: 12px;
+}
+@media (min-width: 640px) {
+  :root {
+    --g-cols: 8;
+    --g-gutter: 20px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --g-cols: 12;
+    --g-gutter: 24px;
+  }
+}
+
+/* Superficies. El Signal Dot y el foco cambian de color con la superficie. */
+.surface-black {
+  --bg: var(--c-black);
+  --fg: var(--c-warm);
+  --fg-2: var(--c-stone-dark);
+  --line: var(--c-rule-dark);
+  --signal: var(--c-canary);
+  --focus: var(--c-canary);
+  background: var(--bg);
+  color: var(--fg);
+  color-scheme: dark;
+}
+.surface-warm {
+  --bg: var(--c-warm);
+  --fg: var(--c-black);
+  --fg-2: var(--c-stone-light);
+  --line: var(--c-rule-light);
+  /* Amarillo sobre warm white tiene 1.2:1: el punto vuelve a la tinta. */
+  --signal: var(--c-black);
+  --focus: var(--c-black);
+  background: var(--bg);
+  color: var(--fg);
+  color-scheme: light;
+}
+:root[data-dot="canary"] .surface-warm {
+  --signal: var(--c-canary);
+}
+
+/* Roles tipográficos. */
+.t-d1,
+.t-d2,
+.t-d3,
+.t-d4 {
+  font-family: var(--f-display);
+  font-weight: 500;
+  margin: 0;
+  text-wrap: balance;
+}
+.t-d1 {
+  font-size: var(--t-d1);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+}
+.t-d2 {
+  font-size: var(--t-d2);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+.t-d3 {
+  font-size: var(--t-d3);
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+}
+.t-d4 {
+  font-size: var(--t-d4);
+  line-height: 1.12;
+  letter-spacing: -0.018em;
+}
+.t-lead {
+  font-family: var(--f-text);
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  letter-spacing: -0.012em;
+  font-weight: 400;
+  margin: 0;
+  text-wrap: pretty;
+}
+.t-body {
+  font-family: var(--f-text);
+  font-size: var(--t-body);
+  line-height: 1.6;
+  font-weight: 400;
+  margin: 0;
+  text-wrap: pretty;
+}
+.t-label {
+  font-family: var(--f-text);
+  font-size: var(--t-label);
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.t-meta {
+  font-family: var(--f-text);
+  font-size: var(--t-meta);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.muted {
+  color: var(--fg-2);
+}
