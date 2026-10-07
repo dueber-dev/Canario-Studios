@@ -32,12 +32,20 @@ const dots = Array.from({ length: 40 * 32 }, (_, index) => {
   </div>
 </section>
 
-<!-- The next scene is intentionally empty until its content is designed. -->
-<section id="signal" class="signal-destination" aria-label="Signal" tabindex="-1"></section>
+<section id="signal" class="signal-destination signal-intro" aria-labelledby="signal-intro-title" tabindex="-1" data-signal-intro>
+  <div class="signal-intro__stage" data-signal-intro-stage>
+    <p id="signal-intro-title" class="signal-intro__copy">Siempre hay algo que podría funcionar mejor.</p>
+  </div>
+</section>
 
 <script>
   import { mountSignalHero } from '../scripts/signal-hero';
 
   const hero = document.querySelector<HTMLElement>('[data-signal-hero]');
   if (hero) mountSignalHero(hero);
+
+  import { mountSignalIntro } from '../scripts/signal-intro';
+
+  const intro = document.querySelector<HTMLElement>('[data-signal-intro]');
+  if (intro) mountSignalIntro(intro);
 </script>
