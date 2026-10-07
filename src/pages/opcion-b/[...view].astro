@@ -1,7 +1,0 @@
----
-import Home from '../../components/Home.astro';
-export function getStaticPaths() {
-  return import.meta.env.DEV ? [{ params: { view: undefined } }] : [];
-}
----
-<Home variant="general" />
