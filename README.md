@@ -32,6 +32,7 @@ Se mantienen Astro, TypeScript, las dependencias instaladas y el workflow de com
 - `src/scripts/signal-cycle.ts`: selección aleatoria con intensidad amarilla equivalente al 25%; las transiciones nunca colorean más del 30% del total. Cada nueva señal dura de 3 a 7 segundos y se intercambia con otra mediante un fundido de 0.6 segundos.
 - `src/styles/site.css`: composición responsive y alternativa sin zoom para movimiento reducido.
 - `src/scripts/signal-intro.ts`: primera escena posterior al hero. La superficie amarilla empieza vacía; el statement entra con scroll amortiguado, permanece centrado durante un tramo y sale con suavidad.
+- El statement usa dos líneas escalonadas: primero aparece `Siempre hay algo que podría`, después `funcionar mejor.`; esta última cambia gradualmente a blanco y a un peso mayor antes de desvanecerse.
 
 El zoom termina en una sección vacía del mismo amarillo del logo (`#F0BC15`). Su contenido queda pendiente. No se interceptan rueda, gestos ni teclas de desplazamiento. Hay un enlace de salto visible al recibir foco con el teclado.
 
