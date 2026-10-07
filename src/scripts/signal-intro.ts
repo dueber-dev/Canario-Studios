@@ -41,9 +41,9 @@ export function mountSignalIntro(scene: HTMLElement) {
       snapNextFrame = false;
     }
     progress = reduceMotion.matches ? target : camera.step(target, dt);
-    const reveal = smooth(0.035, 0.2, progress);
-    const firstLine = smooth(0.035, 0.13, progress);
-    const secondLine = smooth(0.09, 0.24, progress);
+    const reveal = smooth(0.025, 0.16, progress);
+    const firstLine = smooth(0.025, 0.13, progress);
+    const secondLine = smooth(0.3, 0.5, progress);
     const hold = smooth(0.35, 0.68, progress);
     const exit = smooth(0.72, 0.94, progress);
     const visibility = reduceMotion.matches ? 1 : reveal * (1 - exit * 0.92);
@@ -57,7 +57,7 @@ export function mountSignalIntro(scene: HTMLElement) {
     const highlight = reduceMotion.matches ? 0 : smooth(0.56, 0.7, progress);
     accentBlack.style.opacity = (1 - highlight).toFixed(4);
     accentWhite.style.opacity = highlight.toFixed(4);
-    copy.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+    copy.style.transform = `translate3d(-50%, calc(-50% + ${y.toFixed(2)}px), 0) scale(${scale.toFixed(4)})`;
     copy.style.filter = `blur(${blur.toFixed(2)}px)`;
     scene.dataset.progress = progress.toFixed(5);
     scene.dataset.phase = reduceMotion.matches ? 'reduced' : progress < 0.12 ? 'empty' : progress < 0.72 ? 'statement' : 'release';

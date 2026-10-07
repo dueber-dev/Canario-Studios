@@ -88,7 +88,12 @@ body { min-width: 280px; }
 }
 
 .signal-intro__copy {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
   max-width: none;
+  padding: 0 8vw;
   margin: 0;
   color: var(--canario-ink);
   font-size: clamp(2.75rem, 7.5vw, 8.5rem);
@@ -101,10 +106,11 @@ body { min-width: 280px; }
 }
 
 .signal-intro__line { display: block; white-space: nowrap; }
-.signal-intro__line + .signal-intro__line { margin-top: 0.04em; }
-.signal-intro__accent { position: relative; display: inline-block; font-weight: 900; }
+.signal-intro__line + .signal-intro__line { margin-top: 0.18em; }
+.signal-intro__line[data-intro-line='two'] { font-weight: 400; }
+.signal-intro__accent { position: relative; display: inline-block; font-weight: 400; }
 .signal-intro__accent-black { display: inline-block; }
-.signal-intro__accent-white { position: absolute; inset: 0 auto auto 0; color: #fff; font-weight: 900; opacity: 0; }
+.signal-intro__accent-white { position: absolute; inset: 0 auto auto 0; color: #fff; font-weight: 400; opacity: 0; }
 
 .signal-intro[data-ready] .signal-intro__copy { opacity: 0; }
 .signal-intro[data-phase='statement'] .signal-intro__copy { opacity: var(--statement-opacity, 1); }
@@ -112,7 +118,7 @@ body { min-width: 280px; }
 @media (max-width: 600px) {
   .signal-intro { height: 250svh; }
   .signal-intro__stage { padding: 12vw; }
-  .signal-intro__copy { font-size: clamp(2rem, 7.1vw, 4.8rem); }
+  .signal-intro__copy { padding-inline: 4vw; font-size: clamp(1.9rem, 6.4vw, 4.8rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
