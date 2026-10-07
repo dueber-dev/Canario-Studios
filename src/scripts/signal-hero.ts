@@ -30,6 +30,9 @@ export function mountSignalHero(hero: HTMLElement) {
   let visible = true;
   let disposed = false;
   let frame = 0;
+  let idleTime = 0;
+  let lastFrameTime = 0;
+  const drift = { x: 0, y: 0 };
   let loadingSurface = false;
   let surface: ReturnType<typeof createSignalSurface> | undefined;
 
@@ -54,10 +57,21 @@ export function mountSignalHero(hero: HTMLElement) {
     }
   }
 
-  function paint() {
+  function paint(now = performance.now()) {
     frame = 0;
     if (disposed) return;
     progress = reducedMotion.matches ? 0 : clamp(-hero.getBoundingClientRect().top / travel);
+    const idleActive = visible && !document.hidden && !reducedMotion.matches && progress < 0.16;
+    const dt = idleActive && lastFrameTime ? Math.min((now - lastFrameTime) / 1000, 0.05) : 0;
+    lastFrameTime = idleActive ? now : 0;
+    idleTime += dt;
+    const follow = 1 - Math.exp(-dt * 3.5);
+    drift.x += (pointer.x - drift.x) * follow;
+    drift.y += (pointer.y - drift.y) * follow;
+    const floatWeight = reducedMotion.matches ? 0 : 1 - smooth(0.005, 0.16, progress);
+    const floatX = (Math.sin(idleTime * 0.57) * 3 + drift.x * 5) * floatWeight;
+    const floatY = (Math.sin(idleTime * 0.82) * 8 + drift.y * 4) * floatWeight;
+    const floatRoll = Math.sin(idleTime * 0.46) * 0.16 * floatWeight;
     const t = clamp(progress / 0.84);
     const eased = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
     const scale = Math.exp(Math.log(startScale) + Math.log(endScale / startScale) * eased);
@@ -66,9 +80,9 @@ export function mountSignalHero(hero: HTMLElement) {
     const cy = center.y + (target.y - center.y) * blend;
     // Pointer steers the approach only. Both endpoints remain exactly on the logo/dot.
     const arc = Math.sin(Math.PI * eased) * (1 - smooth(0.65, 1, t));
-    const x = width / 2 + pointer.x * Math.min(56, width * 0.04) * arc;
-    const y = height * (0.43 + 0.07 * eased) + pointer.y * 24 * arc;
-    const roll = (pointer.x * 1.5 - 1) * smooth(0.06, 0.5, t) * (1 - smooth(0.62, 0.92, t));
+    const x = width / 2 + pointer.x * Math.min(56, width * 0.04) * arc + floatX;
+    const y = height * (0.43 + 0.07 * eased) + pointer.y * 24 * arc + floatY;
+    const roll = (pointer.x * 1.5 - 1) * smooth(0.06, 0.5, t) * (1 - smooth(0.62, 0.92, t)) + floatRoll;
     wordmark.setAttribute('transform', `translate(${x} ${y}) scale(${scale}) rotate(${roll}) translate(${-cx} ${-cy})`);
     field.style.opacity = String(1 - smooth(0.015, 0.28, progress));
     const entered = t >= 1;
@@ -77,6 +91,7 @@ export function mountSignalHero(hero: HTMLElement) {
     art.style.visibility = entered ? 'hidden' : 'visible';
     hero.dataset.progress = progress.toFixed(5);
     updateSurface();
+    if (idleActive) schedule();
   }
 
   function schedule() {
@@ -85,6 +100,8 @@ export function mountSignalHero(hero: HTMLElement) {
 
   function layout() {
     if (disposed) return;
+    cancelAnimationFrame(frame);
+    frame = 0;
     hero.dataset.motion = reducedMotion.matches ? 'reduced' : 'full';
     width = stage.clientWidth;
     height = stage.clientHeight;
@@ -113,6 +130,8 @@ export function mountSignalHero(hero: HTMLElement) {
   observer.observe(stage);
   const visibility = new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
+    lastFrameTime = 0;
+    if (!visible) { cancelAnimationFrame(frame); frame = 0; }
     updateSurface();
     if (visible) schedule();
   });
@@ -121,7 +140,12 @@ export function mountSignalHero(hero: HTMLElement) {
   window.addEventListener('resize', layout, { passive: true, signal: events.signal });
   window.addEventListener('pointermove', chooseApproach, { passive: true, signal: events.signal });
   window.addEventListener('pageshow', layout, { signal: events.signal });
-  document.addEventListener('visibilitychange', updateSurface, { signal: events.signal });
+  document.addEventListener('visibilitychange', () => {
+    lastFrameTime = 0;
+    updateSurface();
+    if (document.hidden) { cancelAnimationFrame(frame); frame = 0; }
+    else schedule();
+  }, { signal: events.signal });
   reducedMotion.addEventListener('change', layout, { signal: events.signal });
 
   function dispose() {

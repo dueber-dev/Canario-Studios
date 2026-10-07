@@ -61,6 +61,56 @@ body { min-width: 280px; }
 .signal-destination { min-height: 100svh; background: var(--canario-signal); }
 .signal-destination:focus { outline: none; }
 
+.signal-cursor {
+  display: none;
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.signal-cursor__ring, .signal-cursor__dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.signal-cursor__ring {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgb(0 0 0 / 48%);
+  transition: width 420ms cubic-bezier(.2, .8, .2, 1.2), height 420ms cubic-bezier(.2, .8, .2, 1.2), border-color 250ms ease, transform 380ms cubic-bezier(.2, .8, .2, 1.2);
+}
+
+.signal-cursor__dot {
+  width: 6px;
+  height: 6px;
+  background: var(--canario-signal);
+  transition: background-color 220ms ease;
+}
+
+.signal-cursor[data-visible] { opacity: 1; }
+.signal-cursor[data-mode='signal'] .signal-cursor__ring {
+  width: 50px;
+  height: 50px;
+  border-color: var(--canario-signal);
+}
+.signal-cursor[data-mode='action'] .signal-cursor__ring { width: 44px; height: 44px; }
+.signal-cursor[data-pressed] .signal-cursor__ring { transform: translate(-50%, -50%) scale(0.76); }
+.signal-cursor[data-on-yellow='true'] .signal-cursor__dot { background: var(--canario-ink); }
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .signal-cursor { display: block; }
+}
+
 .sr-only, .skip-hero:not(:focus) {
   position: absolute;
   width: 1px;

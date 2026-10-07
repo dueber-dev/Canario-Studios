@@ -1,0 +1,11 @@
+<div class="signal-cursor" data-signal-cursor aria-hidden="true">
+  <span class="signal-cursor__ring"></span>
+  <span class="signal-cursor__dot" data-cursor-dot></span>
+</div>
+
+<script>
+  import { mountSignalCursor } from '../scripts/signal-cursor';
+
+  const cursor = document.querySelector<HTMLElement>('[data-signal-cursor]');
+  if (cursor) mountSignalCursor(cursor);
+</script>
