@@ -120,6 +120,16 @@ export function mountSignalHero(hero: HTMLElement) {
     if (!frame && !disposed) frame = requestAnimationFrame(paint);
   }
 
+  function guardSceneDuringScroll() {
+    // Mark the scene before the next paint. This closes the one-frame gap between
+    // the browser's native scroll jump and the camera's interpolated progress.
+    if (!reducedMotion.matches && hero.getBoundingClientRect().top <= -travel && progress < 0.84) {
+      holdingScene = true;
+      hero.setAttribute('data-holding-scene', '');
+    }
+    schedule();
+  }
+
   function layout() {
     if (disposed) return;
     cancelAnimationFrame(frame);
@@ -158,7 +168,7 @@ export function mountSignalHero(hero: HTMLElement) {
     if (visible) schedule();
   });
   visibility.observe(stage);
-  window.addEventListener('scroll', schedule, { passive: true, signal: events.signal });
+  window.addEventListener('scroll', guardSceneDuringScroll, { passive: true, signal: events.signal });
   window.addEventListener('resize', layout, { passive: true, signal: events.signal });
   window.addEventListener('pointermove', chooseApproach, { passive: true, signal: events.signal });
   window.addEventListener('pageshow', () => { snapNextFrame = true; layout(); }, { signal: events.signal });

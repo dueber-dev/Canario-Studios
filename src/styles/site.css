@@ -40,6 +40,9 @@ body { min-width: 280px; }
   inset: 0;
   z-index: 5;
 }
+.signal-hero[data-motion='full'][data-holding-scene] ~ .signal-destination {
+  visibility: hidden;
+}
 .signal-hero[data-ready] .hero-art {
   inset: 0;
   width: 100%;
