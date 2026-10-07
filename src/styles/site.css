@@ -1,0 +1,96 @@
+:root {
+  color-scheme: light;
+  --canario-paper: #fff;
+  --canario-ink: #000;
+  --canario-signal: #f0bc15;
+  background: var(--canario-paper);
+  color: var(--canario-ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { min-width: 280px; }
+
+.signal-hero { position: relative; }
+.hero-stage {
+  position: relative;
+  height: 100svh;
+  overflow: clip;
+  isolation: isolate;
+  background: var(--canario-paper);
+}
+
+.hero-art {
+  position: absolute;
+  z-index: 1;
+  top: 43%;
+  left: 50%;
+  width: min(86%, 1500px);
+  height: auto;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.signal-hero[data-motion='full'] { height: 340svh; }
+.signal-hero[data-motion='full'] .hero-stage { position: sticky; top: 0; }
+.signal-hero[data-ready] .hero-art {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+}
+
+.signal-surface {
+  position: absolute;
+  inset: 30% 0 0;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent 5%, #000 43%);
+}
+
+.signal-surface canvas, .surface-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.signal-surface[data-renderer='webgl'] .surface-poster { visibility: hidden; }
+.signal-destination { min-height: 100svh; background: var(--canario-signal); }
+.signal-destination:focus { outline: none; }
+
+.sr-only, .skip-hero:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-hero:focus {
+  position: absolute;
+  z-index: 2;
+  top: 24px;
+  left: 24px;
+  padding: 14px 20px;
+  border: 1px solid var(--canario-ink);
+  outline: 2px solid var(--canario-signal);
+  outline-offset: 4px;
+  background: var(--canario-paper);
+  color: var(--canario-ink);
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .hero-art { width: 90%; }
+  .signal-surface { inset-block-start: 37%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-hero[data-motion='full'] { height: auto; }
+  .signal-hero[data-motion='full'] .hero-stage { position: relative; }
+}
