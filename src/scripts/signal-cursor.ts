@@ -88,6 +88,7 @@ export function mountSignalCursor(cursor: HTMLElement) {
   document.addEventListener('pointerout', (event) => { if (!event.relatedTarget) hide(); }, options);
   window.addEventListener('blur', hide, options);
   window.addEventListener('scroll', schedule, options);
+  hero?.addEventListener('signal:scenechange', schedule, options);
   window.addEventListener('resize', schedule, options);
   document.addEventListener('keydown', (event) => { if (event.key === 'Tab') hide(); }, { signal: events.signal });
   document.addEventListener('visibilitychange', hide, options);

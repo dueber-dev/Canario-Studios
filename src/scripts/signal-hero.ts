@@ -5,6 +5,7 @@
  * Canario adaptation: outlined wordmark, fixed Signal Dot destination, native Astro.
  */
 import type { createSignalSurface } from './signal-surface';
+import { ScrollCamera } from './scroll-camera';
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 const smooth = (start: number, end: number, value: number) => {
@@ -26,6 +27,11 @@ export function mountSignalHero(hero: HTMLElement) {
   const target = { x: dot.cx.baseVal.value, y: dot.cy.baseVal.value, radius: dot.r.baseVal.value };
   let width = 1, height = 1, travel = 1, startScale = 1, endScale = 1;
   let progress = 0;
+  let scrollTarget = 0;
+  const camera = new ScrollCamera();
+  let snapNextFrame = true;
+  let holdingScene = false;
+  let previousEntered = false;
   let pointer = { x: 0, y: 0 };
   let visible = true;
   let disposed = false;
@@ -37,7 +43,7 @@ export function mountSignalHero(hero: HTMLElement) {
   let surface: ReturnType<typeof createSignalSurface> | undefined;
 
   function updateSurface() {
-    surface?.setRunning(visible && !document.hidden && !reducedMotion.matches && progress < 0.28);
+    surface?.setRunning((visible || holdingScene) && !document.hidden && !reducedMotion.matches && progress < 0.28);
   }
 
   async function loadSurface() {
@@ -60,11 +66,21 @@ export function mountSignalHero(hero: HTMLElement) {
   function paint(now = performance.now()) {
     frame = 0;
     if (disposed) return;
-    progress = reducedMotion.matches ? 0 : clamp(-hero.getBoundingClientRect().top / travel);
-    const idleActive = visible && !document.hidden && !reducedMotion.matches && progress < 0.16;
-    const dt = idleActive && lastFrameTime ? Math.min((now - lastFrameTime) / 1000, 0.05) : 0;
-    lastFrameTime = idleActive ? now : 0;
-    idleTime += dt;
+    const heroTop = hero.getBoundingClientRect().top;
+    scrollTarget = reducedMotion.matches ? 0 : clamp(-heroTop / travel);
+    const dt = lastFrameTime ? Math.min((now - lastFrameTime) / 1000, 0.05) : 1 / 60;
+    lastFrameTime = now;
+    if (snapNextFrame || reducedMotion.matches) {
+      camera.reset(scrollTarget);
+      snapNextFrame = false;
+    }
+    progress = camera.step(scrollTarget, document.hidden ? 0 : dt);
+    // Preserve the scene when a native scroll fling has already passed the pin.
+    // No wheel/touch event is consumed, and explicit navigation can skip the scene.
+    holdingScene = !reducedMotion.matches && heroTop <= -travel && progress < 0.84;
+    hero.toggleAttribute('data-holding-scene', holdingScene);
+    const idleActive = (visible || holdingScene) && !document.hidden && !reducedMotion.matches && progress < 0.16;
+    if (idleActive) idleTime += dt;
     const follow = 1 - Math.exp(-dt * 3.5);
     drift.x += (pointer.x - drift.x) * follow;
     drift.y += (pointer.y - drift.y) * follow;
@@ -82,7 +98,7 @@ export function mountSignalHero(hero: HTMLElement) {
     const arc = Math.sin(Math.PI * eased) * (1 - smooth(0.65, 1, t));
     const x = width / 2 + pointer.x * Math.min(56, width * 0.04) * arc + floatX;
     const y = height * (0.43 + 0.07 * eased) + pointer.y * 24 * arc + floatY;
-    const roll = (pointer.x * 1.5 - 1) * smooth(0.06, 0.5, t) * (1 - smooth(0.62, 0.92, t)) + floatRoll;
+    const roll = 5 * smooth(0.03, 0.35, t) * (1 - smooth(0.55, 0.9, t)) + floatRoll;
     wordmark.setAttribute('transform', `translate(${x} ${y}) scale(${scale}) rotate(${roll}) translate(${-cx} ${-cy})`);
     field.style.opacity = String(1 - smooth(0.015, 0.28, progress));
     const entered = t >= 1;
@@ -90,8 +106,14 @@ export function mountSignalHero(hero: HTMLElement) {
     stage.style.backgroundColor = entered ? 'var(--canario-signal)' : 'var(--canario-paper)';
     art.style.visibility = entered ? 'hidden' : 'visible';
     hero.dataset.progress = progress.toFixed(5);
+    hero.dataset.scrollTarget = scrollTarget.toFixed(5);
+    if (entered !== previousEntered) {
+      previousEntered = entered;
+      hero.dispatchEvent(new Event('signal:scenechange'));
+    }
     updateSurface();
-    if (idleActive) schedule();
+    if (!document.hidden && (idleActive || camera.isMoving(scrollTarget))) schedule();
+    else lastFrameTime = 0;
   }
 
   function schedule() {
@@ -131,7 +153,7 @@ export function mountSignalHero(hero: HTMLElement) {
   const visibility = new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
     lastFrameTime = 0;
-    if (!visible) { cancelAnimationFrame(frame); frame = 0; }
+    if (!visible && !camera.isMoving(scrollTarget)) { cancelAnimationFrame(frame); frame = 0; }
     updateSurface();
     if (visible) schedule();
   });
@@ -139,7 +161,11 @@ export function mountSignalHero(hero: HTMLElement) {
   window.addEventListener('scroll', schedule, { passive: true, signal: events.signal });
   window.addEventListener('resize', layout, { passive: true, signal: events.signal });
   window.addEventListener('pointermove', chooseApproach, { passive: true, signal: events.signal });
-  window.addEventListener('pageshow', layout, { signal: events.signal });
+  window.addEventListener('pageshow', () => { snapNextFrame = true; layout(); }, { signal: events.signal });
+  hero.querySelector('.skip-hero')?.addEventListener('click', () => {
+    snapNextFrame = true;
+    schedule();
+  }, { signal: events.signal });
   document.addEventListener('visibilitychange', () => {
     lastFrameTime = 0;
     updateSurface();
@@ -155,6 +181,7 @@ export function mountSignalHero(hero: HTMLElement) {
     observer.disconnect();
     visibility.disconnect();
     surface?.dispose();
+    hero.removeAttribute('data-holding-scene');
   }
   document.addEventListener('astro:before-swap', dispose, { once: true, signal: events.signal });
   if (import.meta.hot) import.meta.hot.dispose(dispose);

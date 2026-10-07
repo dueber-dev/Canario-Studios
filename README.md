@@ -11,6 +11,7 @@ npm run check
 npm run build
 npm run preview
 node scripts/verify-signal-cycle.mjs
+node scripts/verify-scroll-camera.mjs
 ```
 
 ## Estado actual
@@ -25,6 +26,7 @@ Se mantienen Astro, TypeScript, las dependencias instaladas y el workflow de com
 - `src/assets/canario-wordmark.svg`: contornos del logo original, sin cambiar la tipografía ni requerir fuentes externas.
 - `src/scripts/signal-hero.ts`: cámara vectorial con scroll nativo. El mouse matiza el recorrido antes de empezar; el destino siempre es el punto amarillo. El zoom es reversible.
 - El logo flota suavemente y responde al mouse con un desplazamiento pequeño. Esta flotación desaparece al comenzar el zoom, para conservar el destino del recorrido.
+- `src/scripts/scroll-camera.ts`: amortiguación y límite de velocidad visual. Un salto completo de scroll llega al amarillo en aproximadamente 2 segundos; un gesto lento conserva su posición objetivo y se asienta suavemente. Si el scroll supera el hero antes de terminar, la escena permanece visible hasta completar el zoom. El enlace de salto y la restauración de página omiten esta espera. La inclinación del acercamiento es de hasta 5° en sentido horario, independiente del mouse.
 - `src/scripts/signal-cursor.ts`: aro decorativo con punto interior retrasado, respuesta al presionar y detección de proximidad al punto del logo. Conserva el cursor del sistema; no intercepta clics, se oculta al usar teclado y se desactiva en pantallas táctiles o con movimiento reducido.
 - `src/scripts/signal-surface.ts`: superficie Three.js de 2,400 puntos redondos. Se detiene al salir de escena, completar su desvanecimiento u ocultar la pestaña.
 - `src/scripts/signal-cycle.ts`: selección aleatoria con intensidad amarilla equivalente al 25%; las transiciones nunca colorean más del 30% del total. Cada nueva señal dura de 3 a 7 segundos y se intercambia con otra mediante un fundido de 0.6 segundos.

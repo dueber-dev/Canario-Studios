@@ -35,6 +35,11 @@ body { min-width: 280px; }
 
 .signal-hero[data-motion='full'] { height: 340svh; }
 .signal-hero[data-motion='full'] .hero-stage { position: sticky; top: 0; }
+.signal-hero[data-motion='full'][data-holding-scene] .hero-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+}
 .signal-hero[data-ready] .hero-art {
   inset: 0;
   width: 100%;
