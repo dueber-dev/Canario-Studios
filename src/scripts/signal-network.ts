@@ -3,7 +3,8 @@
  * about four cells, and spokes reach the ring of points about two cells away.
  * Geometry is in cell units, so the server poster and the canvas share it.
  */
-export const networkSize = { columns: 13.3, rows: 6.65 };
+// The network panel is the box's right-hand part, 10 × 6.3 cells.
+export const networkSize = { columns: 10, rows: 6.3 };
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 const smooth = (start: number, end: number, value: number) => {
@@ -41,8 +42,8 @@ export function networkFrame(node: { x: number; y: number }): NetworkFrame {
 export function nodeAt(time: number) {
   const { columns, rows } = networkSize;
   return {
-    x: columns / 2 + 3.6 * Math.sin(time * 0.61) + 1.4 * Math.sin(time * 0.23 + 1.3),
-    y: rows / 2 + 1.25 * Math.sin(time * 0.47 + 0.6) + 0.55 * Math.sin(time * 0.19 + 2.1),
+    x: columns * (0.5 + 0.27 * Math.sin(time * 0.61) + 0.105 * Math.sin(time * 0.23 + 1.3)),
+    y: rows * (0.5 + 0.188 * Math.sin(time * 0.47 + 0.6) + 0.083 * Math.sin(time * 0.19 + 2.1)),
   };
 }
 

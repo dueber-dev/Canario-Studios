@@ -20,7 +20,9 @@ export function mountSignalHero(hero: HTMLElement) {
   const stage = hero.querySelector<HTMLElement>('[data-hero-stage]')!;
   const art = hero.querySelector<SVGSVGElement>('[data-portal-art]')!;
   const wordmark = art.querySelector<SVGGElement>('[data-wordmark]')!;
-  // The camera dives into black: the stem of the "i" in "canario", under the Signal Dot.
+  // Two portals share one camera: the page opens out of the Signal Dot, and scrolling
+  // dives into black, the stem of the "i" in "canario" right under it.
+  const dot = art.querySelector<SVGCircleElement>('[data-signal-dot]')!;
   const portal = art.querySelector<SVGRectElement>('[data-portal-target]')!;
   // The square dot of "studios" turns on its own centre while the wordmark is in view.
   const studiosSpin = gsap.to(art.querySelector('[data-studios-dot]'), {
@@ -32,7 +34,7 @@ export function mountSignalHero(hero: HTMLElement) {
   const closing = createSignalClosing(hero.querySelector<HTMLElement>('[data-signal-closing]')!);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
-  // ENTRY: the page opens inside the black stem and the camera pulls back to the wordmark,
+  // ENTRY: the page opens inside the Signal Dot and the camera pulls back to the wordmark,
   // the scroll zoom played in reverse. Only from the top, and never with reduced motion.
   const entryHold = 0.35;
   const entryEnd = entryHold + 1.9;
@@ -41,9 +43,10 @@ export function mountSignalHero(hero: HTMLElement) {
   const bounds = wordmark.getBBox();
   const center = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
   const stem = portal.getBBox();
+  const signal = { x: dot.cx.baseVal.value, y: dot.cy.baseVal.value, radius: dot.r.baseVal.value };
   // The largest circle inside the stem: once it covers the screen, the screen is black.
-  const target = { x: stem.x + stem.width / 2, y: stem.y + stem.height / 2, radius: Math.min(stem.width, stem.height) / 2 };
-  let width = 1, height = 1, travel = 1, startScale = 1, endScale = 1;
+  const black = { x: stem.x + stem.width / 2, y: stem.y + stem.height / 2, radius: Math.min(stem.width, stem.height) / 2 };
+  let width = 1, height = 1, travel = 1, startScale = 1, signalScale = 1, blackScale = 1;
   let progress = 0;
   let zoom = 0;
   let scrollTarget = 0;
@@ -124,6 +127,11 @@ export function mountSignalHero(hero: HTMLElement) {
     // Use the complete camera range so the same timeline plays backward on scroll-up.
     // A shortened end range would leave a static tail that made the reverse feel stuck.
     const t = zoom;
+    // The entry's share of the zoom picks the portal. Where scroll takes over mid-entry,
+    // both inputs are equal and the share is 1 on either side, so the target never jumps.
+    const share = zoom > 0 ? clamp(entry / zoom) : 0;
+    const target = { x: black.x + (signal.x - black.x) * share, y: black.y + (signal.y - black.y) * share };
+    const endScale = Math.exp(Math.log(blackScale) + Math.log(signalScale / blackScale) * share);
     const eased = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
     const scale = Math.exp(Math.log(startScale) + Math.log(endScale / startScale) * eased);
     const blend = (1 / scale - 1 / startScale) / (1 / endScale - 1 / startScale);
@@ -139,14 +147,15 @@ export function mountSignalHero(hero: HTMLElement) {
     field.style.opacity = String(1 - smooth(0.015, 0.28, zoom));
     const entered = t >= 1;
     // End scale already covers all four corners; switching layers cannot flash white.
-    stage.style.backgroundColor = entered ? 'var(--canario-ink)' : 'var(--canario-paper)';
+    const inside = share >= 0.5 ? 'var(--canario-signal)' : 'var(--canario-ink)';
+    stage.style.backgroundColor = entered ? inside : 'var(--canario-paper)';
     art.style.visibility = entered ? 'hidden' : 'visible';
     intro.render(sequence, reducedMotion.matches);
     closing.render(sequence, reducedMotion.matches);
     hero.dataset.progress = zoom.toFixed(5);
     hero.dataset.sequence = sequence.toFixed(5);
     hero.dataset.scrollTarget = scrollTarget.toFixed(5);
-    const tone = zoom >= 0.8 ? 'dark' : 'light';
+    const tone = zoom < 0.8 ? 'light' : share >= 0.5 ? 'yellow' : 'dark';
     hero.dataset.tone = tone;
     if (tone !== previousTone) {
       previousTone = tone;
@@ -183,7 +192,9 @@ export function mountSignalHero(hero: HTMLElement) {
     if (!width || !height) return;
     travel = Math.max(1, hero.offsetHeight - height);
     startScale = Math.min(width * (width <= 600 ? 0.9 : 0.86), 1500) / bounds.width;
-    endScale = Math.max(startScale * 1.01, Math.hypot(width, height) / (2 * target.radius) * 1.06);
+    const cover = (radius: number) => Math.max(startScale * 1.01, Math.hypot(width, height) / (2 * radius) * 1.06);
+    signalScale = cover(signal.radius);
+    blackScale = cover(black.radius);
     art.setAttribute('viewBox', `0 0 ${width} ${height}`);
     hero.dataset.ready = '';
     // The canvas only has a size once the full-motion layout is applied.
