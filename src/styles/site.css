@@ -124,18 +124,16 @@ body { min-width: 280px; }
   font-weight: 700;
   line-height: 0.95;
   white-space: nowrap;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em; /* letters are split, so kerning is lost */
   text-transform: uppercase;
 }
-.signal-statement__accent { position: relative; display: inline-block; }
-/* Wider than its box, so tight tracking never leaves the last glyph unlit. */
-.signal-statement__fill {
-  position: absolute;
-  inset: -0.15em -0.2em -0.15em 0;
-  padding-top: 0.15em;
-  color: var(--canario-signal);
-  user-select: none;
-}
+.signal-statement__char, .signal-statement__loop { display: inline-block; }
+/* A slot as tall as the capitals, so the roll to yellow crosses its edge mid-way. */
+.signal-statement__roll { overflow-y: clip; line-height: 0.82; }
+.signal-statement__track { display: block; position: relative; }
+.signal-statement__signal { position: absolute; top: 100%; left: 0; color: var(--canario-signal); }
+/* Without the scroll sequence, "mejor" is already yellow. */
+.signal-hero:not([data-motion='full']) .signal-statement__track > :first-child { color: var(--canario-signal); }
 .signal-statement__list {
   position: absolute;
   top: 28.4cqw;

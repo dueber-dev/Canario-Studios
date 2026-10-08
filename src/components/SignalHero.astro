@@ -19,6 +19,8 @@ const dots = Array.from({ length: 40 * 32 }, (_, index) => {
 });
 
 const words = (text: string) => text.split(' ');
+// The heading's first line ends at "podría".
+const title = words('Siempre hay algo que podría funcionar mejor.').map((word, index) => ({ word, line: index < 5 ? 1 : 2 }));
 // The box's still frame: the node rests on a lattice point, with all twelve spokes.
 const poster = networkFrame({ x: 5.5, y: 3.5 });
 ---
@@ -39,10 +41,20 @@ const poster = networkFrame({ x: 5.5, y: 3.5 });
     {/* Each word rises inside its own mask, so the heading can wrap on any screen. */}
     <div class="signal-statement" data-signal-statement>
       <h2 id="signal-intro-title" class="signal-statement__title">
-        {words('Siempre hay algo que podría funcionar').map((word) => (
-          <><span class="signal-statement__mask"><span class="signal-statement__word" data-statement-word>{word}</span></span>{' '}{word === 'podría' && <br class="signal-statement__break" />}</>
-        ))}
-        <span class="signal-statement__mask"><span class="signal-statement__word" data-statement-word><span class="signal-statement__accent">mejor<span class="signal-statement__fill" aria-hidden="true">mejor</span></span>.</span></span>
+        <span class="sr-only">Siempre hay algo que podría funcionar mejor.</span>
+        {/* Split per letter at build time: the outer span follows the scroll, the inner one
+            replays the loop, and the letters of "mejor" carry a yellow twin for the roll. */}
+        <span aria-hidden="true">
+          {title.map(({ word, line }) => (
+            <><span class="signal-statement__mask" data-title-line={line}>{[...word].map((char) => (
+              word === 'mejor.' && char !== '.' ? (
+                <span class="signal-statement__char signal-statement__roll" data-title-char><span class="signal-statement__loop" data-title-loop><span class="signal-statement__track" data-title-track><span>{char}</span><span class="signal-statement__signal">{char}</span></span></span></span>
+              ) : (
+                <span class="signal-statement__char" data-title-char><span class="signal-statement__loop" data-title-loop>{char}</span></span>
+              )
+            ))}</span>{' '}{word === 'podría' && <br class="signal-statement__break" />}</>
+          ))}
+        </span>
       </h2>
       <ul class="signal-statement__list" aria-label="Dónde puede haber una señal">
         {['Un proceso.', 'Una identidad.', 'Una conexión.'].map((example) => (

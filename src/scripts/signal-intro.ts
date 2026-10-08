@@ -61,13 +61,61 @@ function createDrift(element: HTMLElement) {
   return { setRunning, dispose: () => { setRunning(false); events.abort(); } };
 }
 
+/** Every few seconds of stillness, the heading leaves upward and rises again, letter by
+ *  letter and with the same words, like the reference loop. It never starts mid-scroll. */
+function createTitleLoop(lines: HTMLElement[][]) {
+  const events = new AbortController();
+  const interval = 7;
+  let lastScroll = 0;
+  let armed = false;
+  let pending: gsap.core.Tween | undefined;
+  window.addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true, signal: events.signal });
+
+  // Both lines go together, left to right; a short beat of black, then they return.
+  const replay = gsap.timeline({ paused: true });
+  lines.forEach((loops, index) => {
+    const pass = { duration: 0.42, ease: 'power3.in', stagger: 0.012, immediateRender: false };
+    replay
+      .fromTo(loops, { yPercent: 0 }, { ...pass, yPercent: -140 }, index * 0.06)
+      .fromTo(loops, { yPercent: 140 }, { ...pass, yPercent: 0, duration: 0.6, ease: 'power3.out' }, 0.85 + index * 0.06);
+  });
+
+  function schedule(seconds: number) {
+    pending?.kill();
+    pending = gsap.delayedCall(seconds, () => {
+      // The reader is still scrolling: look again shortly instead of interrupting.
+      if (performance.now() - lastScroll < 2000) return schedule(1);
+      replay.restart();
+      schedule(interval);
+    });
+  }
+
+  function setArmed(value: boolean) {
+    if (armed === value) return;
+    armed = value;
+    // A replay already under way finishes on its own; only the next one is cancelled.
+    if (armed) schedule(interval);
+    else pending?.kill();
+  }
+
+  return {
+    setArmed,
+    reset: () => replay.pause(0),
+    dispose: () => { pending?.kill(); replay.kill(); events.abort(); },
+  };
+}
+
 /**
  * The statement scene, on black after the zoom: heading, the network box and the three
  * possibilities, as a paused GSAP timeline whose playhead is the hero's shared clock.
  */
 export function createSignalIntro(scene: HTMLElement) {
-  const words = [...scene.querySelectorAll<HTMLElement>('[data-statement-word]')];
-  const fill = scene.querySelector<HTMLElement>('.signal-statement__fill')!;
+  const titleLine = (line: number, layer: string) =>
+    [...scene.querySelectorAll<HTMLElement>(`[data-title-line="${line}"] [${layer}]`)];
+  const titleLines = [titleLine(1, 'data-title-char'), titleLine(2, 'data-title-char')];
+  const chars = titleLines.flat();
+  const loops = [titleLine(1, 'data-title-loop'), titleLine(2, 'data-title-loop')];
+  const tracks = [...scene.querySelectorAll<HTMLElement>('[data-title-track]')];
   const examples = [...scene.querySelectorAll<HTMLElement>('[data-signal-example]')];
   const lines = [...scene.querySelectorAll<HTMLElement>('[data-statement-line]')];
   const box = scene.querySelector<HTMLElement>('[data-network-box]')!;
@@ -79,8 +127,12 @@ export function createSignalIntro(scene: HTMLElement) {
   const live = createSignalNetwork(box.querySelector<HTMLCanvasElement>('[data-network-canvas]')!);
   if (live) box.dataset.renderer = 'canvas';
   const drift = createDrift(box);
+  const loop = createTitleLoop(loops);
 
-  // Words rise out of their mask's baseline, and leave upward the same way. No blur.
+  // Heading letters rise from below their mask, left to right, both lines nearly together.
+  // 140% clears the mask for the shorter slots of "mejor" as well.
+  const lift = { yPercent: 0, duration: 0.045, ease: 'power3.out', stagger: 0.0022 };
+  // List lines rise out of their mask's baseline, and leave upward the same way. No blur.
   const below = { yPercent: 115, rotation: 4 };
   const rise = { yPercent: 0, rotation: 0, duration: 0.05, ease: 'expo.out', stagger: 0.006 };
   const leave = { yPercent: -120, duration: 0.03, ease: 'power3.in', stagger: 0.003, immediateRender: false };
@@ -88,11 +140,10 @@ export function createSignalIntro(scene: HTMLElement) {
 
   const timeline = gsap.timeline({ paused: true })
     // The heading lands while the zoom closes on the black stem.
-    .fromTo(words, below, rise, 0.235)
-    // Only "mejor" is lit, left to right, in the signal colour.
-    .fromTo(fill, { clipPath: 'inset(0% 100% 0% 0%)' }, {
-      clipPath: 'inset(0% 0% 0% 0%)', duration: 0.035, ease: 'power2.inOut',
-    }, 0.3)
+    .fromTo(titleLines[0], { yPercent: 140 }, lift, 0.235)
+    .fromTo(titleLines[1], { yPercent: 140 }, lift, 0.25)
+    // Then each letter of "mejor" rolls over to yellow, as "señal" does in the closing.
+    .fromTo(tracks, { yPercent: 0 }, { yPercent: -100, duration: 0.05, ease: 'power3.inOut', stagger: 0.008 }, 0.335)
     .fromTo(network, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.04, ease: 'power2.out' }, 0.355)
     // The box is built on the left, then scrolling slides it right to make room for the list.
     .fromTo(box, { '--shift': 1 }, { '--shift': 0, duration: 0.06, ease: 'power3.inOut', immediateRender: false }, 0.44);
@@ -125,10 +176,11 @@ export function createSignalIntro(scene: HTMLElement) {
     }
   });
   timeline
-    .fromTo([...words, ...lines], { yPercent: 0 }, leave, exit)
+    .fromTo(chars, { yPercent: 0 }, { ...leave, yPercent: -140, stagger: 0.0008 }, exit)
+    .fromTo(lines, { yPercent: 0 }, leave, exit)
     .fromTo(network, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.03, ease: 'none', immediateRender: false }, exit);
 
-  const animated = [...words, fill, box, ...examples, ...lines, ...edges, column, row, network];
+  const animated = [...chars, ...loops.flat(), ...tracks, box, ...examples, ...lines, ...edges, column, row, network];
   let cleared = false;
 
   function render(progress: number, reducedMotion: boolean) {
@@ -141,6 +193,8 @@ export function createSignalIntro(scene: HTMLElement) {
       cleared = true;
       live?.setRunning(false);
       drift.setRunning(false);
+      loop.setArmed(false);
+      loop.reset();
       scene.dataset.phase = 'reduced';
       return;
     }
@@ -152,6 +206,8 @@ export function createSignalIntro(scene: HTMLElement) {
     live?.setRunning(progress > 0.35 && progress < exit + 0.03);
     // It floats from the moment its first edge is drawn, through the slide, until it leaves.
     drift.setRunning(progress > 0.29 && progress < exit + 0.03);
+    // The heading loops only once it has landed and "mejor" is yellow, until the exit.
+    loop.setArmed(progress > 0.42 && progress < exit - 0.01);
     scene.dataset.progress = progress.toFixed(5);
     scene.dataset.phase = progress < 0.235 ? 'portal' : progress < 0.44 ? 'statement' : progress < 0.49 ? 'slide'
       : progress < exit ? ['process', 'identity', 'connection'][Math.min(2, Math.floor((progress - 0.49) / 0.07))] : 'signal';
@@ -160,6 +216,7 @@ export function createSignalIntro(scene: HTMLElement) {
   function dispose() {
     live?.dispose();
     drift.dispose();
+    loop.dispose();
   }
 
   return { render, resize: () => live?.resize(), dispose };
