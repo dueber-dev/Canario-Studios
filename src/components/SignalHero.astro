@@ -30,6 +30,7 @@ const dots = Array.from({ length: 40 * 32 }, (_, index) => {
     <Fragment set:html={wordmark} />
     <a class="skip-hero" href="#signal">Saltar a la siguiente sección</a>
     <section id="signal" class="signal-intro" aria-labelledby="signal-intro-title" tabindex="-1" data-signal-intro>
+    <div class="signal-intro__paper" aria-hidden="true"></div>
     <div class="signal-intro__backdrop" aria-hidden="true"></div>
     <p id="signal-intro-title" class="signal-intro__copy">
       <span class="signal-intro__line" data-intro-line="one">Siempre hay algo</span>

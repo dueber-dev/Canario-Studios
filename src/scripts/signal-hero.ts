@@ -117,7 +117,7 @@ export function mountSignalHero(hero: HTMLElement) {
     hero.dataset.progress = progress.toFixed(5);
     hero.dataset.sequence = sequence.toFixed(5);
     hero.dataset.scrollTarget = scrollTarget.toFixed(5);
-    const tone = sequence >= 0.835 ? 'dark' : progress >= 0.8 ? 'yellow' : 'light';
+    const tone = sequence >= 0.895 ? 'dark' : sequence >= 0.575 ? 'light' : progress >= 0.8 ? 'yellow' : 'light';
     hero.dataset.tone = tone;
     if (tone !== previousTone) {
       previousTone = tone;

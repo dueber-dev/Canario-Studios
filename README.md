@@ -32,7 +32,7 @@ Se mantienen Astro, TypeScript, las dependencias instaladas y el workflow de com
 - `src/scripts/signal-cycle.ts`: selección aleatoria con intensidad amarilla equivalente al 25%; las transiciones nunca colorean más del 30% del total. Cada nueva señal dura de 3 a 7 segundos y se intercambia con otra mediante un fundido de 0.6 segundos.
 - `src/styles/site.css`: composición responsive y alternativa sin zoom para movimiento reducido.
 - `src/scripts/signal-intro.ts`: muestrea la misma línea de tiempo que el zoom, sin un segundo control de scroll. Todo permanece en un único viewport sticky durante 760svh de recorrido total. Al subir se reproducen exactamente los mismos estados en reversa.
-- La primera frase aparece por opacidad, sin blur ni desplazamiento, antes de que termine el zoom. Conserva dos líneas escalonadas en peso regular; solo `funcionar mejor` cambia a blanco. Después entran `Un proceso.`, `Una identidad.` y `Una conexión.` una a una. Al finalizar, el amarillo se funde a negro y un punto amarillo con un pulso discreto acompaña `Esa es la señal.`.
+- La primera frase aparece por opacidad, sin blur ni desplazamiento, antes de que termine el zoom. Conserva dos líneas escalonadas en peso regular; solo `funcionar mejor` cambia a blanco y permanece para lectura antes de desaparecer. El fondo pasa de amarillo a blanco antes de que entren `Un proceso.`, `Una identidad.` y `Una conexión.` una a una, en negro. Al finalizar, el blanco se funde a negro y un punto amarillo con un pulso discreto acompaña `Esa es la señal.`.
 
 SIGNAL queda completa hasta `Esa es la señal.`. OBSERVE y el resto de la landing quedan pendientes. No se interceptan rueda, gestos ni teclas de desplazamiento. Hay un enlace de salto visible al recibir foco con el teclado.
 

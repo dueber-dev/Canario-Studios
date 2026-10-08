@@ -7,10 +7,11 @@ Se sustituyen las dos escenas independientes por un viewport sticky que contiene
 - Zoom del wordmark: 0–0.29 del progreso compartido.
 - Primera línea: 0.225–0.27; aparece durante el cierre del zoom, directamente en su posición de lectura, solo con opacidad.
 - Segunda línea: 0.35–0.395. Resaltado blanco exclusivo de “funcionar mejor”: 0.425–0.46.
-- Salida de la frase: 0.475–0.515.
-- Proceso, identidad, conexión: entradas en 0.53, 0.61 y 0.69, conservando las líneas anteriores atenuadas.
-- Retirada de las posibilidades: 0.785–0.825. Fundido del amarillo a negro: 0.805–0.87.
-- Punto amarillo y un único pulso, seguidos de “Esa es la señal.”: 0.835–0.93. El final queda estable para lectura.
+- Pausa con “funcionar mejor” completamente blanco: 0.46–0.515, ampliada desde el intervalo anterior 0.46–0.475. Salida de la frase: 0.515–0.555.
+- Transición de amarillo a blanco: 0.555–0.595, sin texto superpuesto durante el cambio.
+- Proceso, identidad, conexión: entradas en 0.605, 0.685 y 0.765, en negro sobre blanco; las líneas anteriores se atenúan al 50% para conservar su legibilidad.
+- Retirada de las posibilidades: 0.845–0.88. Fundido del blanco a negro: 0.865–0.925.
+- Punto amarillo y un único pulso, seguidos de “Esa es la señal.”: 0.89–0.985. El final conserva su composición y queda estable para lectura.
 
 Todas las propiedades se calculan a partir del mismo progreso. La secuencia no depende de callbacks de entrada/salida ni de temporizadores, y es reversible. Un scroll rápido mantiene el orden narrativo y el límite de velocidad. Se conserva el contenido en flujo normal sin JavaScript o con movimiento reducido.
 
