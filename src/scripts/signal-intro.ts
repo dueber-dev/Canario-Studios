@@ -41,8 +41,8 @@ export function mountSignalIntro(scene: HTMLElement) {
       snapNextFrame = false;
     }
     progress = reduceMotion.matches ? target : camera.step(target, dt);
-    const reveal = smooth(0, 0.16, progress);
-    const firstLine = smooth(0, 0.13, progress);
+    const reveal = smooth(-0.04, 0.12, progress);
+    const firstLine = smooth(-0.03, 0.1, progress);
     const secondLine = smooth(0.3, 0.5, progress);
     const hold = smooth(0.35, 0.68, progress);
     const exit = smooth(0.72, 0.94, progress);
