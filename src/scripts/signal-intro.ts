@@ -23,11 +23,13 @@ export function mountSignalIntro(scene: HTMLElement) {
   let active = true;
   let disposed = false;
   let travel = 1;
+  let preloadDistance = 0;
   const camera = new ScrollCamera();
   let snapNextFrame = true;
 
   function measure() {
     travel = Math.max(1, scene.offsetHeight - stage.clientHeight);
+    preloadDistance = stage.clientHeight * 0.34;
   }
 
   function paint(time = performance.now()) {
@@ -35,7 +37,8 @@ export function mountSignalIntro(scene: HTMLElement) {
     if (disposed) return;
     const dt = Math.min(Math.max(0, time - previous) / 1000, 0.05);
     previous = time;
-    target = reduceMotion.matches ? 0.5 : clamp(-scene.getBoundingClientRect().top / travel);
+    const sceneTop = scene.getBoundingClientRect().top;
+    target = reduceMotion.matches ? 0.5 : clamp((preloadDistance - sceneTop) / travel);
     if (snapNextFrame || reduceMotion.matches) {
       camera.reset(target);
       snapNextFrame = false;
@@ -47,9 +50,9 @@ export function mountSignalIntro(scene: HTMLElement) {
     const hold = smooth(0.35, 0.68, progress);
     const exit = smooth(0.72, 0.94, progress);
     const visibility = reduceMotion.matches ? 1 : reveal * (1 - exit * 0.92);
-    const y = reduceMotion.matches ? 0 : (1 - reveal) * 34 - exit * 18;
+    const y = 0;
     const scale = reduceMotion.matches ? 1 : 0.965 + reveal * 0.035 - exit * 0.01;
-    const blur = reduceMotion.matches ? 0 : (1 - reveal) * 8 + exit * 3;
+    const blur = reduceMotion.matches ? 0 : (1 - reveal) * 2 + exit * 1.5;
 
     copy.style.opacity = visibility.toFixed(4);
     lineOne.style.opacity = (reduceMotion.matches ? 1 : firstLine).toFixed(4);
@@ -86,7 +89,7 @@ export function mountSignalIntro(scene: HTMLElement) {
     active = entry.isIntersecting || entry.intersectionRatio > 0;
     if (active) schedule();
     else { cancelAnimationFrame(frame); frame = 0; }
-  }, { rootMargin: '100% 0px' });
+  }, { rootMargin: '200% 0px' });
 
   scene.dataset.ready = '';
   measure();

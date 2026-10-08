@@ -13,6 +13,8 @@ La segunda línea comienza a aparecer después de un tramo de scroll más amplio
 
 La cámara del hero usa ahora el rango completo `0 → 1`. Esto elimina el tramo estático al final del zoom y permite que la misma trayectoria se reproduzca en reversa al subir.
 
+La entrada del statement se precarga durante los últimos `34%` de un viewport antes de que la sección amarilla ocupe toda la pantalla. Se eliminó el desplazamiento vertical de entrada y el desenfoque se limitó a un máximo de `2px`, evitando que aparezca una sombra que sube antes del texto.
+
 ## Verificación
 
 - `npm run check` — correcto, sin diagnósticos de Astro.
