@@ -11,15 +11,12 @@ export function createSignalIntro(scene: HTMLElement) {
   const second = scene.querySelector<HTMLElement>('[data-intro-line="two"]')!;
   const accent = scene.querySelector<HTMLElement>('.signal-intro__accent')!;
   const examples = [...scene.querySelectorAll<HTMLElement>('[data-signal-example]')];
-  const closing = scene.querySelector<HTMLElement>('.signal-intro__closing p')!;
-  const beacon = scene.querySelector<HTMLElement>('.signal-intro__beacon')!;
-  const ripple = scene.querySelector<HTMLElement>('.signal-intro__ripple')!;
   const backdrop = scene.querySelector<HTMLElement>('.signal-intro__backdrop')!;
   const paper = scene.querySelector<HTMLElement>('.signal-intro__paper')!;
 
   function render(progress: number, reducedMotion: boolean) {
     if (reducedMotion) {
-      [copy, first, second, accent, ...examples, closing, beacon, ripple, backdrop, paper]
+      [copy, first, second, accent, ...examples, backdrop, paper]
         .forEach((element) => element.removeAttribute('style'));
       scene.dataset.phase = 'reduced';
       return;
@@ -47,15 +44,8 @@ export function createSignalIntro(scene: HTMLElement) {
       example.style.transform = `translateY(${(1 - reveal) * 10}px)`;
     });
 
-    const night = smooth(0.865, 0.925, progress);
-    backdrop.style.opacity = String(night);
-    const pointReveal = smooth(0.89, 0.93, progress);
-    beacon.style.opacity = String(pointReveal);
-    beacon.style.transform = `scale(${0.65 + pointReveal * 0.35})`;
-    const pulse = smooth(0.905, 0.98, progress);
-    ripple.style.opacity = String(Math.sin(Math.PI * pulse) * 0.45);
-    ripple.style.transform = `scale(${1 + pulse * 3})`;
-    closing.style.opacity = String(smooth(0.935, 0.985, progress));
+    // Black is complete as the closing line rises (see signal-closing.ts).
+    backdrop.style.opacity = String(smooth(0.865, 0.925, progress));
     scene.dataset.progress = progress.toFixed(5);
     scene.dataset.phase = progress < 0.225 ? 'portal' : progress < 0.555 ? 'statement'
       : progress < 0.605 ? 'paper' : progress < 0.88 ? 'examples' : 'signal';

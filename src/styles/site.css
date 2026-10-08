@@ -33,7 +33,7 @@ body { min-width: 280px; }
   pointer-events: none;
 }
 
-.signal-hero[data-motion='full'] { height: 760svh; }
+.signal-hero[data-motion='full'] { height: var(--sequence-height, 760svh); }
 .signal-hero[data-motion='full'] .hero-stage { position: sticky; top: 0; }
 .signal-hero[data-motion='full'][data-holding-scene] .hero-stage {
   position: fixed;
@@ -100,38 +100,35 @@ body { min-width: 280px; }
 .signal-intro__examples { font-size: 1.13em; line-height: 1.3; background: var(--canario-paper); }
 .signal-hero[data-motion='full'] .signal-intro__examples { background: transparent; }
 .signal-intro__examples p { will-change: opacity, transform; }
-.signal-intro__closing { color: #fff; background: #10100e; }
+.signal-intro__closing { color: #fff; background: var(--canario-ink); font-weight: 700; letter-spacing: -0.04em; }
 .signal-hero[data-motion='full'] .signal-intro__closing { background: transparent; }
-.signal-intro__closing p { font-size: 1.1em; }
+/* About 5.2vw: the line spans a third of the screen, as in the design. */
+.signal-intro__closing p { font-size: 0.84em; line-height: 1.1; }
 .signal-intro__backdrop, .signal-intro__paper { display: none; }
 .signal-hero[data-motion='full'] :is(.signal-intro__backdrop, .signal-intro__paper) {
   display: block;
   position: absolute;
   inset: 0;
-  background: #10100e;
+  background: var(--canario-ink);
   opacity: 0;
 }
 .signal-hero[data-motion='full'] .signal-intro__paper { background: var(--canario-paper); }
-.signal-intro__beacon {
-  display: block;
-  position: relative;
-  width: clamp(14px, 1.5vw, 22px);
-  aspect-ratio: 1;
-  margin: 0 auto 0.65em;
-  border-radius: 50%;
-  background: var(--canario-signal);
-}
-.signal-intro__ripple {
-  position: absolute;
-  inset: -1px;
-  border: 1px solid var(--canario-signal);
-  border-radius: 50%;
-  opacity: 0;
-}
-.signal-hero[data-motion='full'] :is(.signal-intro__line, [data-signal-example], .signal-intro__closing p, .signal-intro__beacon) { opacity: 0; }
+/* The line is a mask: letters rise from below its baseline. */
+.signal-closing__type { display: inline-block; padding-block: 0.12em; overflow-y: clip; white-space: nowrap; }
+.signal-closing__word, .signal-closing__char { display: inline-block; }
+.signal-closing__char { transform-origin: 0 100%; }
+/* A slot as tall as the letters (ñ included), so the roll crosses its edge mid-way. */
+.signal-closing__roll { overflow-y: clip; line-height: 0.82; }
+.signal-closing__track { display: block; position: relative; }
+.signal-closing__signal { position: absolute; top: 100%; left: 0; color: var(--canario-signal); }
+/* Without JavaScript, show the finished composition. */
+.signal-hero:not([data-motion]) .signal-closing__track > :first-child { color: var(--canario-signal); }
+.signal-hero[data-motion='full'] :is(.signal-intro__line, [data-signal-example]) { opacity: 0; }
+.signal-hero[data-motion='full'] .signal-closing__type { visibility: hidden; }
 
 @media (max-width: 600px) {
   .signal-intro { font-size: clamp(1.1rem, 6.5vw, 2.4rem); }
+  .signal-intro__closing p { font-size: 1.4em; }
 }
 
 .signal-hero:not([data-motion='full']) .hero-stage { height: auto; padding-top: 100svh; }

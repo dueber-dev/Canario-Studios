@@ -41,9 +41,23 @@ const dots = Array.from({ length: 40 * 32 }, (_, index) => {
       <p data-signal-example>Una identidad.</p>
       <p data-signal-example>Una conexión.</p>
     </div>
-    <div class="signal-intro__closing">
-      <span class="signal-intro__beacon" aria-hidden="true"><span class="signal-intro__ripple"></span></span>
-      <p>Esa es la señal.</p>
+    <div class="signal-intro__closing" data-signal-closing>
+      <p>
+        <span class="sr-only">Esa es la señal.</span>
+        {/* Split per letter at build time, so the layout never shifts when JS runs. */}
+        <span class="signal-closing__type" aria-hidden="true" data-closing-type>
+          {['Esa', 'es', 'la'].map((word) => (
+            <><span class="signal-closing__word">{[...word].map((char) => <span class="signal-closing__char" data-closing-char>{char}</span>)}</span>{' '}</>
+          ))}
+          <span class="signal-closing__word">
+            {[...'señal'].map((char) => (
+              <span class="signal-closing__char signal-closing__roll" data-closing-char>
+                <span class="signal-closing__track" data-closing-track><span>{char}</span><span class="signal-closing__signal">{char}</span></span>
+              </span>
+            ))}<span class="signal-closing__char" data-closing-char>.</span>
+          </span>
+        </span>
+      </p>
     </div>
     </section>
   </div>
