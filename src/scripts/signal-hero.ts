@@ -6,6 +6,7 @@
  */
 import type { createSignalSurface } from './signal-surface';
 import { ScrollCamera } from './scroll-camera';
+import { createSignalIntro } from './signal-intro';
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 const smooth = (start: number, end: number, value: number) => {
@@ -19,6 +20,8 @@ export function mountSignalHero(hero: HTMLElement) {
   const wordmark = art.querySelector<SVGGElement>('[data-wordmark]')!;
   const dot = art.querySelector<SVGCircleElement>('[data-signal-dot]')!;
   const field = hero.querySelector<HTMLElement>('[data-signal-surface]')!;
+  const introElement = hero.querySelector<HTMLElement>('[data-signal-intro]')!;
+  const intro = createSignalIntro(introElement);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
   const events = new AbortController();
@@ -28,10 +31,12 @@ export function mountSignalHero(hero: HTMLElement) {
   let width = 1, height = 1, travel = 1, startScale = 1, endScale = 1;
   let progress = 0;
   let scrollTarget = 0;
-  const camera = new ScrollCamera();
+  // A shared clock prevents the text from advancing before a fast zoom finishes.
+  const camera = new ScrollCamera(0.12);
+  const zoomEnd = 0.29;
   let snapNextFrame = true;
   let holdingScene = false;
-  let previousEntered = false;
+  let previousTone = '';
   let pointer = { x: 0, y: 0 };
   let visible = true;
   let disposed = false;
@@ -74,10 +79,11 @@ export function mountSignalHero(hero: HTMLElement) {
       camera.reset(scrollTarget);
       snapNextFrame = false;
     }
-    progress = camera.step(scrollTarget, document.hidden ? 0 : dt);
+    const sequence = camera.step(scrollTarget, document.hidden ? 0 : dt);
+    progress = clamp(sequence / zoomEnd);
     // Preserve the scene when a native scroll fling has already passed the pin.
     // No wheel/touch event is consumed, and explicit navigation can skip the scene.
-    holdingScene = !reducedMotion.matches && heroTop <= -travel && progress < 0.98;
+    holdingScene = !reducedMotion.matches && heroTop <= -travel && sequence < 0.9999;
     hero.toggleAttribute('data-holding-scene', holdingScene);
     const idleActive = (visible || holdingScene) && !document.hidden && !reducedMotion.matches && progress < 0.16;
     if (idleActive) idleTime += dt;
@@ -107,10 +113,14 @@ export function mountSignalHero(hero: HTMLElement) {
     // End scale already covers all four corners; switching layers cannot flash white.
     stage.style.backgroundColor = entered ? 'var(--canario-signal)' : 'var(--canario-paper)';
     art.style.visibility = entered ? 'hidden' : 'visible';
+    intro.render(sequence, reducedMotion.matches);
     hero.dataset.progress = progress.toFixed(5);
+    hero.dataset.sequence = sequence.toFixed(5);
     hero.dataset.scrollTarget = scrollTarget.toFixed(5);
-    if (entered !== previousEntered) {
-      previousEntered = entered;
+    const tone = sequence >= 0.835 ? 'dark' : progress >= 0.8 ? 'yellow' : 'light';
+    hero.dataset.tone = tone;
+    if (tone !== previousTone) {
+      previousTone = tone;
       hero.dispatchEvent(new Event('signal:scenechange'));
     }
     updateSurface();
@@ -125,7 +135,7 @@ export function mountSignalHero(hero: HTMLElement) {
   function guardSceneDuringScroll() {
     // Mark the scene before the next paint. This closes the one-frame gap between
     // the browser's native scroll jump and the camera's interpolated progress.
-    if (!reducedMotion.matches && hero.getBoundingClientRect().top <= -travel && progress < 0.98) {
+    if (!reducedMotion.matches && hero.getBoundingClientRect().top <= -travel && camera.progress < 0.9999) {
       holdingScene = true;
       hero.setAttribute('data-holding-scene', '');
     }
@@ -138,7 +148,7 @@ export function mountSignalHero(hero: HTMLElement) {
     frame = 0;
     hero.dataset.motion = reducedMotion.matches ? 'reduced' : 'full';
     width = stage.clientWidth;
-    height = stage.clientHeight;
+    height = reducedMotion.matches ? window.innerHeight : stage.clientHeight;
     if (!width || !height) return;
     travel = Math.max(1, hero.offsetHeight - height);
     startScale = Math.min(width * (width <= 600 ? 0.9 : 0.86), 1500) / bounds.width;
@@ -174,9 +184,13 @@ export function mountSignalHero(hero: HTMLElement) {
   window.addEventListener('resize', layout, { passive: true, signal: events.signal });
   window.addEventListener('pointermove', chooseApproach, { passive: true, signal: events.signal });
   window.addEventListener('pageshow', () => { snapNextFrame = true; layout(); }, { signal: events.signal });
-  hero.querySelector('.skip-hero')?.addEventListener('click', () => {
-    snapNextFrame = true;
-    schedule();
+  hero.querySelector('.skip-hero')?.addEventListener('click', (event) => {
+    if (reducedMotion.matches) return;
+    event.preventDefault();
+    camera.reset(zoomEnd);
+    window.scrollTo({ top: window.scrollY + hero.getBoundingClientRect().top + travel * zoomEnd, behavior: 'instant' });
+    introElement.focus({ preventScroll: true });
+    paint();
   }, { signal: events.signal });
   document.addEventListener('visibilitychange', () => {
     lastFrameTime = 0;

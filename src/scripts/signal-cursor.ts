@@ -28,7 +28,7 @@ export function mountSignalCursor(cursor: HTMLElement) {
     const detected = rect && Math.hypot(target.x - rect.x - rect.width / 2, target.y - rect.y - rect.height / 2) < rect.width / 2 + 30;
     const hit = document.elementFromPoint(target.x, target.y);
     const action = hit?.closest('a, button, input, textarea, select, [role="button"]');
-    const onYellow = progress >= 0.84 || Boolean(hit?.closest('.signal-destination'));
+    const onYellow = hero?.dataset.tone === 'yellow';
 
     // Time-based damping: the point follows the ring, with its offset kept inside it.
     const ringEase = 1 - Math.exp(-dt / 0.055);
@@ -45,6 +45,7 @@ export function mountSignalCursor(cursor: HTMLElement) {
     inner.style.transform = `translate(calc(-50% + ${dx * limit}px), calc(-50% + ${dy * limit}px))`;
     cursor.dataset.mode = detected ? 'signal' : action ? 'action' : 'idle';
     cursor.dataset.onYellow = String(onYellow);
+    cursor.dataset.onDark = String(hero?.dataset.tone === 'dark');
     cursor.dataset.visible = 'true';
 
     // Stop as soon as the follower settles; pointer/scroll events wake it again.

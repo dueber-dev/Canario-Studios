@@ -37,3 +37,25 @@ for (const fps of [30, 60, 144]) {
   results.push({ fps, yellowAfterSeconds: enteredAt, settledAfterSeconds: settledAt });
 }
 console.log(JSON.stringify(results));
+
+// The full SIGNAL sequence uses a slower shared clock. Flinging to the end
+// must show the opening before the conclusion, and reversing must never jump.
+for (const fps of [30, 60, 144]) {
+  const camera = new ScrollCamera(0.12);
+  let firstVisible = 0;
+  for (let frame = 1; frame <= fps * 10; frame++) {
+    const before = camera.progress;
+    camera.step(1, 1 / fps);
+    assert.ok(camera.progress >= before && camera.progress - before <= 0.12 / fps + 1e-9);
+    if (!firstVisible && camera.progress >= 0.225) firstVisible = frame / fps;
+  }
+  assert.ok(firstVisible >= 1.85 && firstVisible <= 1.92, 'Opening starts during the final zoom');
+  assert.equal(camera.progress, 1, 'A fast scroll reaches the closing without an endless tail');
+  for (let frame = 0; frame < fps * 10; frame++) {
+    const before = camera.progress;
+    camera.step(0, 1 / fps);
+    assert.ok(camera.progress <= before && before - camera.progress <= 0.12 / fps + 1e-9);
+  }
+  assert.equal(camera.progress, 0, 'Reverse returns fully to the logo');
+}
+console.log('Shared SIGNAL clock: forward/reverse at 30, 60 and 144 fps passed.');

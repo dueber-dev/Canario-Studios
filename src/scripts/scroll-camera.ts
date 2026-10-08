@@ -1,7 +1,11 @@
 /** Smooth scroll targets without letting a wheel fling skip the camera journey. */
 export class ScrollCamera {
   progress = 0;
-  readonly maxSpeed = 0.42;
+  readonly maxSpeed: number;
+
+  constructor(maxSpeed = 0.42) {
+    this.maxSpeed = maxSpeed;
+  }
   readonly damping = 0.12;
 
   reset(target: number) {
