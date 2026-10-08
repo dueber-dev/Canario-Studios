@@ -19,8 +19,9 @@ const dots = Array.from({ length: 40 * 32 }, (_, index) => {
 });
 
 const words = (text: string) => text.split(' ');
-// The heading's first line ends at "podría".
-const title = words('Siempre hay algo que podría funcionar mejor.').map((word, index) => ({ word, line: index < 5 ? 1 : 2 }));
+// The heading is set in three lines: "siempre hay algo" / "que podría" / "funcionar mejor."
+const breaks = ['algo', 'podría'];
+const title = words('Siempre hay algo que podría funcionar mejor.').map((word, index) => ({ word, line: index < 3 ? 1 : index < 5 ? 2 : 3 }));
 // The box's still frame: the node rests on a lattice point, with all twelve spokes.
 const poster = networkFrame({ x: 5.5, y: 3.5 });
 ---
@@ -52,7 +53,7 @@ const poster = networkFrame({ x: 5.5, y: 3.5 });
               ) : (
                 <span class="signal-statement__char" data-title-char><span class="signal-statement__loop" data-title-loop>{char}</span></span>
               )
-            ))}</span>{' '}{word === 'podría' && <br class="signal-statement__break" />}</>
+            ))}</span>{' '}{breaks.includes(word) && <br class="signal-statement__break" />}</>
           ))}
         </span>
       </h2>

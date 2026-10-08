@@ -113,20 +113,22 @@ body { min-width: 280px; }
 /* Masks keep accents and descenders inside; the negative margin preserves spacing. */
 .signal-statement__mask { display: inline-block; padding-block: 0.12em; margin-block: -0.12em; overflow-y: clip; }
 .signal-statement__word { display: inline-block; transform-origin: 0 100%; }
-/* Two set lines, as designed: the break after "PODRÍA" never depends on rounding.
-   It sits 3.5cqw lower than the frame, leaving room for the site header above it. */
+/* Three set lines, as designed; the breaks never depend on rounding. Its capitals start
+   9.55cqw down, leaving room for the site header above it. */
 .signal-statement__title {
   position: absolute;
-  top: 8.94cqw;
+  top: 9.14cqw;
   left: 5cqw;
   margin: 0;
   font-size: 5.82cqw;
   font-weight: 700;
-  line-height: 0.95;
+  line-height: 0.88;
   white-space: nowrap;
   letter-spacing: -0.045em; /* letters are split, so kerning is lost */
   text-transform: uppercase;
 }
+/* The lines are tight, so the masks reach higher: the accent of "Í" stays inside. */
+.signal-statement__title .signal-statement__mask { padding-block: 0.18em; margin-block: -0.18em; }
 .signal-statement__char, .signal-statement__loop { display: inline-block; }
 /* A slot as tall as the capitals, so the roll to yellow crosses its edge mid-way. */
 .signal-statement__roll { overflow-y: clip; line-height: 0.82; }
@@ -136,7 +138,7 @@ body { min-width: 280px; }
 .signal-hero:not([data-motion='full']) .signal-statement__track > :first-child { color: var(--canario-signal); }
 .signal-statement__list {
   position: absolute;
-  top: 28.4cqw;
+  top: 30.89cqw;
   left: 5.5cqw;
   display: flex;
   flex-direction: column;
@@ -151,7 +153,7 @@ body { min-width: 280px; }
 /* The box is its own container, so its labels scale with it in either layout. */
 .signal-statement__box {
   position: absolute;
-  top: 24.87cqw;
+  top: 27.36cqw;
   left: 36.58cqw;
   width: 58.42cqw;
   aspect-ratio: 444 / 207;

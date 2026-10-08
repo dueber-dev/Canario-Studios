@@ -71,7 +71,7 @@ function createTitleLoop(lines: HTMLElement[][]) {
   let pending: gsap.core.Tween | undefined;
   window.addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true, signal: events.signal });
 
-  // Both lines go together, left to right; a short beat of black, then they return.
+  // The lines go together, left to right; a short beat of black, then they return.
   const replay = gsap.timeline({ paused: true });
   lines.forEach((loops, index) => {
     const pass = { duration: 0.42, ease: 'power3.in', stagger: 0.012, immediateRender: false };
@@ -112,9 +112,9 @@ function createTitleLoop(lines: HTMLElement[][]) {
 export function createSignalIntro(scene: HTMLElement) {
   const titleLine = (line: number, layer: string) =>
     [...scene.querySelectorAll<HTMLElement>(`[data-title-line="${line}"] [${layer}]`)];
-  const titleLines = [titleLine(1, 'data-title-char'), titleLine(2, 'data-title-char')];
+  const titleLines = [1, 2, 3].map((line) => titleLine(line, 'data-title-char'));
   const chars = titleLines.flat();
-  const loops = [titleLine(1, 'data-title-loop'), titleLine(2, 'data-title-loop')];
+  const loops = [1, 2, 3].map((line) => titleLine(line, 'data-title-loop'));
   const tracks = [...scene.querySelectorAll<HTMLElement>('[data-title-track]')];
   const examples = [...scene.querySelectorAll<HTMLElement>('[data-signal-example]')];
   const lines = [...scene.querySelectorAll<HTMLElement>('[data-statement-line]')];
@@ -129,7 +129,7 @@ export function createSignalIntro(scene: HTMLElement) {
   const drift = createDrift(box);
   const loop = createTitleLoop(loops);
 
-  // Heading letters rise from below their mask, left to right, both lines nearly together.
+  // Heading letters rise from below their mask, left to right, the lines nearly together.
   // 140% clears the mask for the shorter slots of "mejor" as well.
   const lift = { yPercent: 0, duration: 0.045, ease: 'power3.out', stagger: 0.0022 };
   // List lines rise out of their mask's baseline, and leave upward the same way. No blur.
@@ -141,7 +141,8 @@ export function createSignalIntro(scene: HTMLElement) {
   const timeline = gsap.timeline({ paused: true })
     // The heading lands while the zoom closes on the black stem.
     .fromTo(titleLines[0], { yPercent: 140 }, lift, 0.235)
-    .fromTo(titleLines[1], { yPercent: 140 }, lift, 0.25)
+    .fromTo(titleLines[1], { yPercent: 140 }, lift, 0.245)
+    .fromTo(titleLines[2], { yPercent: 140 }, lift, 0.255)
     // Then each letter of "mejor" rolls over to yellow, as "señal" does in the closing.
     .fromTo(tracks, { yPercent: 0 }, { yPercent: -100, duration: 0.05, ease: 'power3.inOut', stagger: 0.008 }, 0.335)
     .fromTo(network, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.04, ease: 'power2.out' }, 0.355)
