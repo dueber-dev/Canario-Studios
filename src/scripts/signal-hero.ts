@@ -77,7 +77,7 @@ export function mountSignalHero(hero: HTMLElement) {
     progress = camera.step(scrollTarget, document.hidden ? 0 : dt);
     // Preserve the scene when a native scroll fling has already passed the pin.
     // No wheel/touch event is consumed, and explicit navigation can skip the scene.
-    holdingScene = !reducedMotion.matches && heroTop <= -travel && progress < 0.84;
+    holdingScene = !reducedMotion.matches && heroTop <= -travel && progress < 0.98;
     hero.toggleAttribute('data-holding-scene', holdingScene);
     const idleActive = (visible || holdingScene) && !document.hidden && !reducedMotion.matches && progress < 0.16;
     if (idleActive) idleTime += dt;
@@ -88,7 +88,9 @@ export function mountSignalHero(hero: HTMLElement) {
     const floatX = (Math.sin(idleTime * 0.57) * 3 + drift.x * 5) * floatWeight;
     const floatY = (Math.sin(idleTime * 0.82) * 8 + drift.y * 4) * floatWeight;
     const floatRoll = Math.sin(idleTime * 0.46) * 0.16 * floatWeight;
-    const t = clamp(progress / 0.84);
+    // Use the complete camera range so the same timeline plays backward on scroll-up.
+    // A shortened end range would leave a static tail that made the reverse feel stuck.
+    const t = clamp(progress);
     const eased = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
     const scale = Math.exp(Math.log(startScale) + Math.log(endScale / startScale) * eased);
     const blend = (1 / scale - 1 / startScale) / (1 / endScale - 1 / startScale);
@@ -123,7 +125,7 @@ export function mountSignalHero(hero: HTMLElement) {
   function guardSceneDuringScroll() {
     // Mark the scene before the next paint. This closes the one-frame gap between
     // the browser's native scroll jump and the camera's interpolated progress.
-    if (!reducedMotion.matches && hero.getBoundingClientRect().top <= -travel && progress < 0.84) {
+    if (!reducedMotion.matches && hero.getBoundingClientRect().top <= -travel && progress < 0.98) {
       holdingScene = true;
       hero.setAttribute('data-holding-scene', '');
     }

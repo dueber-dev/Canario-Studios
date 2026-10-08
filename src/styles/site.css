@@ -97,7 +97,7 @@ body { min-width: 280px; }
   margin: 0;
   color: var(--canario-ink);
   font-size: clamp(2.4rem, 6.2vw, 7.5rem);
-  font-weight: 700;
+  font-weight: 400;
   line-height: 0.96;
   letter-spacing: -0.065em;
   text-align: center;
@@ -107,7 +107,8 @@ body { min-width: 280px; }
 
 .signal-intro__line { display: block; white-space: nowrap; }
 .signal-intro__line + .signal-intro__line { margin-top: 0.18em; }
-.signal-intro__line[data-intro-line='two'] { font-weight: 400; }
+.signal-intro__line[data-intro-line='one'], .signal-intro__line[data-intro-line='two'] { font-weight: 400; }
+.signal-intro__prefix { white-space: pre; }
 .signal-intro__accent { position: relative; display: inline-block; font-weight: 400; }
 .signal-intro__accent-black { display: inline-block; }
 .signal-intro__accent-white { position: absolute; inset: 0 auto auto 0; color: #fff; font-weight: 400; opacity: 0; }

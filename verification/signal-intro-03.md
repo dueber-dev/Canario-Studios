@@ -7,9 +7,11 @@ La escena amarilla ahora presenta el texto en el orden solicitado:
 > Siempre hay algo
 > que podría funcionar mejor.
 
-La primera línea conserva el peso fuerte de la entrada y la segunda usa un peso regular, sin destacar “funcionar mejor”. El bloque usa posicionamiento absoluto dentro de la etapa sticky y una transformación que mantiene su centro geométrico en el viewport durante la escena.
+Ambas líneas usan el mismo peso regular. Solo “funcionar mejor” dispone de una capa blanca superpuesta; “que podría” permanece negro durante toda la escena. El bloque usa posicionamiento absoluto dentro de la etapa sticky y una transformación que mantiene su centro geométrico en el viewport durante la escena.
 
 La segunda línea comienza a aparecer después de un tramo de scroll más amplio (`0.30 → 0.50` del progreso amortiguado), mientras la primera línea y la visibilidad general ya son perceptibles en el primer frame de la escena y terminan de entrar suavemente (`-0.03 → 0.10` y `-0.04 → 0.12`). El tamaño tipográfico se redujo para dejar más aire alrededor del bloque. En el tramo posterior, la frase completa conserva su transición gradual a blanco.
+
+La cámara del hero usa ahora el rango completo `0 → 1`. Esto elimina el tramo estático al final del zoom y permite que la misma trayectoria se reproduzca en reversa al subir.
 
 ## Verificación
 
