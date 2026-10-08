@@ -20,7 +20,8 @@ export function mountSignalHero(hero: HTMLElement) {
   const stage = hero.querySelector<HTMLElement>('[data-hero-stage]')!;
   const art = hero.querySelector<SVGSVGElement>('[data-portal-art]')!;
   const wordmark = art.querySelector<SVGGElement>('[data-wordmark]')!;
-  const dot = art.querySelector<SVGCircleElement>('[data-signal-dot]')!;
+  // The camera dives into black: the stem of the "i" in "canario", under the Signal Dot.
+  const portal = art.querySelector<SVGRectElement>('[data-portal-target]')!;
   // The square dot of "studios" turns on its own centre while the wordmark is in view.
   const studiosSpin = gsap.to(art.querySelector('[data-studios-dot]'), {
     rotation: 360, duration: 4, ease: 'none', repeat: -1, transformOrigin: '50% 50%', paused: true,
@@ -31,7 +32,7 @@ export function mountSignalHero(hero: HTMLElement) {
   const closing = createSignalClosing(hero.querySelector<HTMLElement>('[data-signal-closing]')!);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
-  // ENTRY: the page opens inside the Signal Dot and the camera pulls back to the wordmark,
+  // ENTRY: the page opens inside the black stem and the camera pulls back to the wordmark,
   // the scroll zoom played in reverse. Only from the top, and never with reduced motion.
   const entryHold = 0.35;
   const entryEnd = entryHold + 1.9;
@@ -39,14 +40,16 @@ export function mountSignalHero(hero: HTMLElement) {
   const events = new AbortController();
   const bounds = wordmark.getBBox();
   const center = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
-  const target = { x: dot.cx.baseVal.value, y: dot.cy.baseVal.value, radius: dot.r.baseVal.value };
+  const stem = portal.getBBox();
+  // The largest circle inside the stem: once it covers the screen, the screen is black.
+  const target = { x: stem.x + stem.width / 2, y: stem.y + stem.height / 2, radius: Math.min(stem.width, stem.height) / 2 };
   let width = 1, height = 1, travel = 1, startScale = 1, endScale = 1;
   let progress = 0;
   let zoom = 0;
   let scrollTarget = 0;
   // A shared clock prevents the text from advancing before a fast zoom finishes.
-  // SIGNAL keeps its 0–1 timings; the closing extends the same clock to hold "señal".
-  const sequenceEnd = 1.25;
+  // The statement scene ends at 0.75; the closing extends the clock to hold "señal".
+  const sequenceEnd = 1.1;
   const camera = new ScrollCamera(0.12, sequenceEnd);
   const zoomEnd = 0.29;
   let snapNextFrame = true;
@@ -136,14 +139,14 @@ export function mountSignalHero(hero: HTMLElement) {
     field.style.opacity = String(1 - smooth(0.015, 0.28, zoom));
     const entered = t >= 1;
     // End scale already covers all four corners; switching layers cannot flash white.
-    stage.style.backgroundColor = entered ? 'var(--canario-signal)' : 'var(--canario-paper)';
+    stage.style.backgroundColor = entered ? 'var(--canario-ink)' : 'var(--canario-paper)';
     art.style.visibility = entered ? 'hidden' : 'visible';
     intro.render(sequence, reducedMotion.matches);
     closing.render(sequence, reducedMotion.matches);
     hero.dataset.progress = zoom.toFixed(5);
     hero.dataset.sequence = sequence.toFixed(5);
     hero.dataset.scrollTarget = scrollTarget.toFixed(5);
-    const tone = sequence >= 0.895 ? 'dark' : sequence >= 0.575 ? 'light' : zoom >= 0.8 ? 'yellow' : 'light';
+    const tone = zoom >= 0.8 ? 'dark' : 'light';
     hero.dataset.tone = tone;
     if (tone !== previousTone) {
       previousTone = tone;
@@ -183,6 +186,8 @@ export function mountSignalHero(hero: HTMLElement) {
     endScale = Math.max(startScale * 1.01, Math.hypot(width, height) / (2 * target.radius) * 1.06);
     art.setAttribute('viewBox', `0 0 ${width} ${height}`);
     hero.dataset.ready = '';
+    // The canvas only has a size once the full-motion layout is applied.
+    intro.resize();
     paint();
     if (reducedMotion.matches) {
       surface?.dispose();
@@ -232,6 +237,7 @@ export function mountSignalHero(hero: HTMLElement) {
   function dispose() {
     disposed = true;
     studiosSpin.kill();
+    intro.dispose();
     cancelAnimationFrame(frame);
     events.abort();
     observer.disconnect();

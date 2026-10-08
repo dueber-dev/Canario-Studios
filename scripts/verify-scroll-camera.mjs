@@ -61,13 +61,13 @@ for (const fps of [30, 60, 144]) {
 console.log('Shared SIGNAL clock: forward/reverse at 30, 60 and 144 fps passed.');
 
 for (const fps of [30, 60, 144]) {
-  const camera = new ScrollCamera(0.12, 1.25);
+  const camera = new ScrollCamera(0.12, 1.1);
   camera.reset(0.9);
-  for (let frame = 0; frame < fps * 8; frame++) camera.step(1.25, 1 / fps);
-  assert.equal(camera.progress, 1.25, 'The closing remains reachable beyond SIGNAL');
+  for (let frame = 0; frame < fps * 8; frame++) camera.step(1.1, 1 / fps);
+  assert.equal(camera.progress, 1.1, 'The closing remains reachable beyond SIGNAL');
   for (let frame = 0; frame < fps * 8; frame++) camera.step(0.9, 1 / fps);
   assert.equal(camera.progress, 0.9, 'The closing reverses smoothly into SIGNAL');
   camera.reset(99);
-  assert.equal(camera.progress, 1.25, 'Restore respects the configured end');
+  assert.equal(camera.progress, 1.1, 'Restore respects the configured end');
 }
 console.log('Extended closing timeline: forward, reverse and restore passed.');

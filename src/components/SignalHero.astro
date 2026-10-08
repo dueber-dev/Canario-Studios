@@ -1,5 +1,6 @@
 ---
 import wordmark from '../assets/canario-wordmark.svg?raw';
+import { networkFrame, networkSize } from '../scripts/signal-network';
 
 // A static surface is available before WebGL loads and when motion is reduced.
 const dots = Array.from({ length: 40 * 32 }, (_, index) => {
@@ -17,6 +18,8 @@ const dots = Array.from({ length: 40 * 32 }, (_, index) => {
 });
 
 const words = (text: string) => text.split(' ');
+// The box's still frame: the node rests on a lattice point, with all twelve spokes.
+const poster = networkFrame({ x: 6.5, y: 3.5 });
 ---
 
 <section class="signal-hero" aria-labelledby="hero-title" data-signal-hero>
@@ -32,23 +35,32 @@ const words = (text: string) => text.split(' ');
     <Fragment set:html={wordmark} />
     <a class="skip-hero" href="#signal">Saltar a la siguiente sección</a>
     <section id="signal" class="signal-intro" aria-labelledby="signal-intro-title" tabindex="-1" data-signal-intro>
-    <div class="signal-intro__paper" aria-hidden="true"></div>
-    <div class="signal-intro__backdrop" aria-hidden="true"></div>
-    {/* Each line masks its words, which rise from the baseline. */}
-    <p id="signal-intro-title" class="signal-intro__copy">
-      <span class="signal-intro__line" data-intro-line="one">
-        {words('Siempre hay algo').map((word, index) => <>{index ? ' ' : ''}<span class="signal-intro__word" data-intro-word>{word}</span></>)}
-      </span>
-      <span class="signal-intro__line" data-intro-line="two">
-        <span class="signal-intro__word" data-intro-word>que</span>{' '}
-        <span class="signal-intro__word" data-intro-word>podría</span>{' '}
-        <span class="signal-intro__word" data-intro-word><span class="signal-intro__accent">funcionar mejor<span class="signal-intro__fill" aria-hidden="true">funcionar mejor</span></span>.</span>
-      </span>
-    </p>
-    <div class="signal-intro__examples" aria-label="Dónde puede haber una señal">
-      {['Un proceso.', 'Una identidad.', 'Una conexión.'].map((example) => (
-        <p data-signal-example>{words(example).map((word, index) => <>{index ? ' ' : ''}<span class="signal-intro__word" data-intro-word>{word}</span></>)}</p>
-      ))}
+    {/* Each word rises inside its own mask, so the heading can wrap on any screen. */}
+    <div class="signal-statement" data-signal-statement>
+      <h2 id="signal-intro-title" class="signal-statement__title">
+        {words('Siempre hay algo que podría funcionar').map((word) => (
+          <><span class="signal-statement__mask"><span class="signal-statement__word" data-statement-word>{word}</span></span>{' '}</>
+        ))}
+        <span class="signal-statement__mask"><span class="signal-statement__word" data-statement-word><span class="signal-statement__accent">mejor<span class="signal-statement__fill" aria-hidden="true">mejor</span></span>.</span></span>
+      </h2>
+      <ul class="signal-statement__list" aria-label="Dónde puede haber una señal">
+        {['Un proceso.', 'Una identidad.', 'Una conexión.'].map((example) => (
+          <li class="signal-statement__mask" data-signal-example><span class="signal-statement__word" data-statement-line>{example}</span></li>
+        ))}
+      </ul>
+      <div class="signal-statement__box" aria-hidden="true" data-network-box>
+        {['top', 'right', 'bottom', 'left'].map((edge) => <span class="signal-statement__edge" data-edge={edge}></span>)}
+        <div class="signal-statement__network" data-network>
+          <svg class="signal-statement__poster" viewBox={`0 0 ${networkSize.columns} ${networkSize.rows}`} focusable="false">
+            {poster.spokes.map((spoke) => (
+              <line x1={poster.node.x} y1={poster.node.y} x2={spoke.x} y2={spoke.y} stroke="#fff" stroke-opacity={0.72 * spoke.alpha} stroke-width="0.02" />
+            ))}
+            {poster.dots.map((dot) => <circle cx={dot.x} cy={dot.y} r={dot.r} fill="#fff" fill-opacity={dot.alpha} />)}
+            <circle cx={poster.node.x} cy={poster.node.y} r={poster.node.r} fill="#fff" />
+          </svg>
+          <canvas class="signal-statement__canvas" data-network-canvas></canvas>
+        </div>
+      </div>
     </div>
     <div class="signal-intro__closing" data-signal-closing>
       <p>
