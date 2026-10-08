@@ -8,6 +8,7 @@ import type { createSignalSurface } from './signal-surface';
 import { ScrollCamera } from './scroll-camera';
 import { createSignalIntro } from './signal-intro';
 import { createSignalClosing } from './signal-closing';
+import { playWordmarkEntry } from './wordmark-entry';
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 const smooth = (start: number, end: number, value: number) => {
@@ -50,6 +51,7 @@ export function mountSignalHero(hero: HTMLElement) {
   const drift = { x: 0, y: 0 };
   let loadingSurface = false;
   let surface: ReturnType<typeof createSignalSurface> | undefined;
+  let stopEntry: (() => void) | undefined;
 
   function updateSurface() {
     surface?.setRunning((visible || holdingScene) && !document.hidden && !reducedMotion.matches && progress < 0.28);
@@ -209,6 +211,7 @@ export function mountSignalHero(hero: HTMLElement) {
 
   function dispose() {
     disposed = true;
+    stopEntry?.();
     cancelAnimationFrame(frame);
     events.abort();
     observer.disconnect();
@@ -219,5 +222,8 @@ export function mountSignalHero(hero: HTMLElement) {
   document.addEventListener('astro:before-swap', dispose, { once: true, signal: events.signal });
   if (import.meta.hot) import.meta.hot.dispose(dispose);
   layout();
+  // The opening plays only from the top; a restored scroll position starts settled.
+  if (!reducedMotion.matches && camera.progress === 0) stopEntry = playWordmarkEntry(wordmark, dot);
+  document.documentElement.removeAttribute('data-intro');
   return dispose;
 }

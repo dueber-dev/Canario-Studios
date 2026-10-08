@@ -15,6 +15,8 @@ const dots = Array.from({ length: 40 * 32 }, (_, index) => {
     signal: (index * 37) % 101 < 25,
   };
 });
+
+const words = (text: string) => text.split(' ');
 ---
 
 <section class="signal-hero" aria-labelledby="hero-title" data-signal-hero>
@@ -32,14 +34,21 @@ const dots = Array.from({ length: 40 * 32 }, (_, index) => {
     <section id="signal" class="signal-intro" aria-labelledby="signal-intro-title" tabindex="-1" data-signal-intro>
     <div class="signal-intro__paper" aria-hidden="true"></div>
     <div class="signal-intro__backdrop" aria-hidden="true"></div>
+    {/* Each line masks its words, which rise from the baseline. */}
     <p id="signal-intro-title" class="signal-intro__copy">
-      <span class="signal-intro__line" data-intro-line="one">Siempre hay algo</span>
-      <span class="signal-intro__line" data-intro-line="two"><span class="signal-intro__prefix">que podría </span><span class="signal-intro__accent">funcionar mejor</span>.</span>
+      <span class="signal-intro__line" data-intro-line="one">
+        {words('Siempre hay algo').map((word, index) => <>{index ? ' ' : ''}<span class="signal-intro__word" data-intro-word>{word}</span></>)}
+      </span>
+      <span class="signal-intro__line" data-intro-line="two">
+        <span class="signal-intro__word" data-intro-word>que</span>{' '}
+        <span class="signal-intro__word" data-intro-word>podría</span>{' '}
+        <span class="signal-intro__word" data-intro-word><span class="signal-intro__accent">funcionar mejor<span class="signal-intro__fill" aria-hidden="true">funcionar mejor</span></span>.</span>
+      </span>
     </p>
     <div class="signal-intro__examples" aria-label="Dónde puede haber una señal">
-      <p data-signal-example>Un proceso.</p>
-      <p data-signal-example>Una identidad.</p>
-      <p data-signal-example>Una conexión.</p>
+      {['Un proceso.', 'Una identidad.', 'Una conexión.'].map((example) => (
+        <p data-signal-example>{words(example).map((word, index) => <>{index ? ' ' : ''}<span class="signal-intro__word" data-intro-word>{word}</span></>)}</p>
+      ))}
     </div>
     <div class="signal-intro__closing" data-signal-closing>
       <p>
