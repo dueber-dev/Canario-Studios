@@ -4,6 +4,7 @@
  * A scroll-driven camera through live type. Keep this notice with copies.
  * Canario adaptation: outlined wordmark, fixed Signal Dot destination, native Astro.
  */
+import { gsap } from 'gsap';
 import type { createSignalSurface } from './signal-surface';
 import { ScrollCamera } from './scroll-camera';
 import { createSignalIntro } from './signal-intro';
@@ -21,6 +22,10 @@ export function mountSignalHero(hero: HTMLElement) {
   const art = hero.querySelector<SVGSVGElement>('[data-portal-art]')!;
   const wordmark = art.querySelector<SVGGElement>('[data-wordmark]')!;
   const dot = art.querySelector<SVGCircleElement>('[data-signal-dot]')!;
+  // The square dot of "studios" turns on its own centre while the wordmark is in view.
+  const studiosSpin = gsap.to(art.querySelector('[data-studios-dot]'), {
+    rotation: 360, duration: 4, ease: 'none', repeat: -1, transformOrigin: '50% 50%', paused: true,
+  });
   const field = hero.querySelector<HTMLElement>('[data-signal-surface]')!;
   const introElement = hero.querySelector<HTMLElement>('[data-signal-intro]')!;
   const intro = createSignalIntro(introElement);
@@ -54,7 +59,11 @@ export function mountSignalHero(hero: HTMLElement) {
   let stopEntry: (() => void) | undefined;
 
   function updateSurface() {
-    surface?.setRunning((visible || holdingScene) && !document.hidden && !reducedMotion.matches && progress < 0.28);
+    const running = (visible || holdingScene) && !document.hidden && !reducedMotion.matches && progress < 0.28;
+    surface?.setRunning(running);
+    // Reduced motion leaves the dot upright.
+    if (reducedMotion.matches) studiosSpin.pause(0);
+    else studiosSpin.paused(!running);
   }
 
   async function loadSurface() {
@@ -212,6 +221,7 @@ export function mountSignalHero(hero: HTMLElement) {
   function dispose() {
     disposed = true;
     stopEntry?.();
+    studiosSpin.kill();
     cancelAnimationFrame(frame);
     events.abort();
     observer.disconnect();
