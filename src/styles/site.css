@@ -40,9 +40,12 @@ body { min-width: 280px; }
   inset: 0;
   z-index: 5;
 }
-/* Waiting for the opening (see wordmark-entry.ts); without the script it appears anyway. */
-:root[data-intro] [data-wordmark] > * { opacity: 0; animation: wordmark-fallback 0s 2s forwards; }
-@keyframes wordmark-fallback { to { opacity: 1; } }
+/* The page opens inside the Signal Dot (see signal-hero.ts). Until the script paints,
+   hold that yellow; without the script, the wordmark appears anyway after 2s. */
+:root[data-intro] .hero-stage { background: var(--canario-signal); animation: intro-paper 0s 2s forwards; }
+:root[data-intro] :is(.hero-art, .signal-surface) { visibility: hidden; animation: intro-reveal 0s 2s forwards; }
+@keyframes intro-paper { to { background: var(--canario-paper); } }
+@keyframes intro-reveal { to { visibility: visible; } }
 .signal-hero[data-ready] .hero-art {
   inset: 0;
   width: 100%;

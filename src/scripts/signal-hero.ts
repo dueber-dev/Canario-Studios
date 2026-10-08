@@ -9,7 +9,6 @@ import type { createSignalSurface } from './signal-surface';
 import { ScrollCamera } from './scroll-camera';
 import { createSignalIntro } from './signal-intro';
 import { createSignalClosing } from './signal-closing';
-import { playWordmarkEntry } from './wordmark-entry';
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 const smooth = (start: number, end: number, value: number) => {
@@ -32,12 +31,18 @@ export function mountSignalHero(hero: HTMLElement) {
   const closing = createSignalClosing(hero.querySelector<HTMLElement>('[data-signal-closing]')!);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+  // ENTRY: the page opens inside the Signal Dot and the camera pulls back to the wordmark,
+  // the scroll zoom played in reverse. Only from the top, and never with reduced motion.
+  const entryHold = 0.35;
+  const entryEnd = entryHold + 1.9;
+  let entryTime = reducedMotion.matches || hero.getBoundingClientRect().top < 0 ? entryEnd : 0;
   const events = new AbortController();
   const bounds = wordmark.getBBox();
   const center = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
   const target = { x: dot.cx.baseVal.value, y: dot.cy.baseVal.value, radius: dot.r.baseVal.value };
   let width = 1, height = 1, travel = 1, startScale = 1, endScale = 1;
   let progress = 0;
+  let zoom = 0;
   let scrollTarget = 0;
   // A shared clock prevents the text from advancing before a fast zoom finishes.
   // SIGNAL keeps its 0–1 timings; the closing extends the same clock to hold "señal".
@@ -56,10 +61,9 @@ export function mountSignalHero(hero: HTMLElement) {
   const drift = { x: 0, y: 0 };
   let loadingSurface = false;
   let surface: ReturnType<typeof createSignalSurface> | undefined;
-  let stopEntry: (() => void) | undefined;
 
   function updateSurface() {
-    const running = (visible || holdingScene) && !document.hidden && !reducedMotion.matches && progress < 0.28;
+    const running = (visible || holdingScene) && !document.hidden && !reducedMotion.matches && zoom < 0.28;
     surface?.setRunning(running);
     // Reduced motion leaves the dot upright.
     if (reducedMotion.matches) studiosSpin.pause(0);
@@ -96,6 +100,11 @@ export function mountSignalHero(hero: HTMLElement) {
     }
     const sequence = camera.step(scrollTarget, document.hidden ? 0 : dt);
     progress = clamp(sequence / zoomEnd);
+    // Only visible time counts, so a tab opened in the background still starts inside the dot.
+    if (!document.hidden) entryTime = Math.min(entryEnd, entryTime + dt);
+    const entry = reducedMotion.matches ? 0 : 1 - clamp((entryTime - entryHold) / (entryEnd - entryHold));
+    // One camera serves both: scrolling during the pull-back takes over without a jump.
+    zoom = Math.max(progress, entry);
     // Preserve the scene when a native scroll fling has already passed the pin.
     // No wheel/touch event is consumed, and explicit navigation can skip the scene.
     holdingScene = !reducedMotion.matches && heroTop <= -travel && sequence < sequenceEnd - 0.0001;
@@ -105,13 +114,13 @@ export function mountSignalHero(hero: HTMLElement) {
     const follow = 1 - Math.exp(-dt * 3.5);
     drift.x += (pointer.x - drift.x) * follow;
     drift.y += (pointer.y - drift.y) * follow;
-    const floatWeight = reducedMotion.matches ? 0 : 1 - smooth(0.005, 0.16, progress);
+    const floatWeight = reducedMotion.matches ? 0 : 1 - smooth(0.005, 0.16, zoom);
     const floatX = (Math.sin(idleTime * 0.57) * 3 + drift.x * 5) * floatWeight;
     const floatY = (Math.sin(idleTime * 0.82) * 8 + drift.y * 4) * floatWeight;
     const floatRoll = Math.sin(idleTime * 0.46) * 0.16 * floatWeight;
     // Use the complete camera range so the same timeline plays backward on scroll-up.
     // A shortened end range would leave a static tail that made the reverse feel stuck.
-    const t = clamp(progress);
+    const t = zoom;
     const eased = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
     const scale = Math.exp(Math.log(startScale) + Math.log(endScale / startScale) * eased);
     const blend = (1 / scale - 1 / startScale) / (1 / endScale - 1 / startScale);
@@ -123,24 +132,24 @@ export function mountSignalHero(hero: HTMLElement) {
     const y = height * (0.43 + 0.07 * eased) + pointer.y * 24 * arc + floatY;
     const roll = 5 * smooth(0.03, 0.35, t) * (1 - smooth(0.55, 0.9, t)) + floatRoll;
     wordmark.setAttribute('transform', `translate(${x} ${y}) scale(${scale}) rotate(${roll}) translate(${-cx} ${-cy})`);
-    field.style.opacity = String(1 - smooth(0.015, 0.28, progress));
+    field.style.opacity = String(1 - smooth(0.015, 0.28, zoom));
     const entered = t >= 1;
     // End scale already covers all four corners; switching layers cannot flash white.
     stage.style.backgroundColor = entered ? 'var(--canario-signal)' : 'var(--canario-paper)';
     art.style.visibility = entered ? 'hidden' : 'visible';
     intro.render(sequence, reducedMotion.matches);
     closing.render(sequence, reducedMotion.matches);
-    hero.dataset.progress = progress.toFixed(5);
+    hero.dataset.progress = zoom.toFixed(5);
     hero.dataset.sequence = sequence.toFixed(5);
     hero.dataset.scrollTarget = scrollTarget.toFixed(5);
-    const tone = sequence >= 0.895 ? 'dark' : sequence >= 0.575 ? 'light' : progress >= 0.8 ? 'yellow' : 'light';
+    const tone = sequence >= 0.895 ? 'dark' : sequence >= 0.575 ? 'light' : zoom >= 0.8 ? 'yellow' : 'light';
     hero.dataset.tone = tone;
     if (tone !== previousTone) {
       previousTone = tone;
       hero.dispatchEvent(new Event('signal:scenechange'));
     }
     updateSurface();
-    if (!document.hidden && (idleActive || camera.isMoving(scrollTarget))) schedule();
+    if (!document.hidden && (idleActive || entry > 0 || camera.isMoving(scrollTarget))) schedule();
     else lastFrameTime = 0;
   }
 
@@ -205,6 +214,7 @@ export function mountSignalHero(hero: HTMLElement) {
   hero.querySelector('.skip-hero')?.addEventListener('click', (event) => {
     if (reducedMotion.matches) return;
     event.preventDefault();
+    entryTime = entryEnd;
     camera.reset(zoomEnd);
     window.scrollTo({ top: window.scrollY + hero.getBoundingClientRect().top + travel * zoomEnd / sequenceEnd, behavior: 'instant' });
     introElement.focus({ preventScroll: true });
@@ -220,7 +230,6 @@ export function mountSignalHero(hero: HTMLElement) {
 
   function dispose() {
     disposed = true;
-    stopEntry?.();
     studiosSpin.kill();
     cancelAnimationFrame(frame);
     events.abort();
@@ -232,8 +241,7 @@ export function mountSignalHero(hero: HTMLElement) {
   document.addEventListener('astro:before-swap', dispose, { once: true, signal: events.signal });
   if (import.meta.hot) import.meta.hot.dispose(dispose);
   layout();
-  // The opening plays only from the top; a restored scroll position starts settled.
-  if (!reducedMotion.matches && camera.progress === 0) stopEntry = playWordmarkEntry(wordmark, dot);
+  // The first paint now holds the opening frame; release the pre-script cover.
   document.documentElement.removeAttribute('data-intro');
   return dispose;
 }
