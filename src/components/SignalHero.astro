@@ -53,7 +53,7 @@ const poster = networkFrame({ x: 5.5, y: 3.5 });
         {['top', 'right', 'bottom', 'left'].map((edge) => <span class="signal-statement__edge" data-edge={edge}></span>)}
         {['column', 'row'].map((rule) => <span class="signal-statement__rule" data-rule={rule}></span>)}
         <p class="signal-statement__label" data-decode>Señal</p>
-        <p class="signal-statement__note" data-decode>Indicio de que algo puede funcionar mejor. Aparece donde se cruzan un proceso, una identidad y una conexión.</p>
+        <p class="signal-statement__note" data-decode>Todo negocio emite señales antes de pedir un cambio. Leerlas a tiempo es saber por dónde empezar.</p>
         <div class="signal-statement__network" data-network>
           <svg class="signal-statement__poster" viewBox={`0 0 ${networkSize.columns} ${networkSize.rows}`} focusable="false">
             {poster.spokes.map((spoke) => (

@@ -113,10 +113,11 @@ body { min-width: 280px; }
 /* Masks keep accents and descenders inside; the negative margin preserves spacing. */
 .signal-statement__mask { display: inline-block; padding-block: 0.12em; margin-block: -0.12em; overflow-y: clip; }
 .signal-statement__word { display: inline-block; transform-origin: 0 100%; }
-/* Two set lines, as designed: the break after "PODRÍA" never depends on rounding. */
+/* Two set lines, as designed: the break after "PODRÍA" never depends on rounding.
+   It sits 3.5cqw lower than the frame, leaving room for the site header above it. */
 .signal-statement__title {
   position: absolute;
-  top: 5.44cqw;
+  top: 8.94cqw;
   left: 5cqw;
   margin: 0;
   font-size: 5.82cqw;

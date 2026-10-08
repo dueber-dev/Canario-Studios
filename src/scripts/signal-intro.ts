@@ -16,6 +16,51 @@ function decode(text: string, progress: number) {
   }).join('');
 }
 
+/** The box floats like the wordmark: a slow sway, plus a lean toward a fine pointer. */
+function createDrift(element: HTMLElement) {
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+  const events = new AbortController();
+  const pointer = { x: 0, y: 0 };
+  const lean = { x: 0, y: 0 };
+  let running = false;
+  let frame = 0;
+  let time = 0;
+  let lastTime = 0;
+
+  window.addEventListener('pointermove', (event) => {
+    if (!finePointer.matches) return;
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = (event.clientY / window.innerHeight) * 2 - 1;
+  }, { passive: true, signal: events.signal });
+
+  function animate(now: number) {
+    frame = 0;
+    if (!running) return;
+    // Time-based, so it floats at the same pace on any refresh rate.
+    const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.05) : 1 / 60;
+    lastTime = now;
+    time += dt;
+    const follow = 1 - Math.exp(-dt * 3.5);
+    lean.x += (pointer.x - lean.x) * follow;
+    lean.y += (pointer.y - lean.y) * follow;
+    const x = Math.sin(time * 0.57) * 3 + lean.x * 8;
+    const y = Math.sin(time * 0.82) * 7 + lean.y * 6;
+    element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${Math.sin(time * 0.46) * 0.2}deg)`;
+    frame = requestAnimationFrame(animate);
+  }
+
+  function setRunning(value: boolean) {
+    if (running === value) return;
+    running = value;
+    cancelAnimationFrame(frame);
+    frame = 0;
+    lastTime = 0;
+    if (running) frame = requestAnimationFrame(animate);
+  }
+
+  return { setRunning, dispose: () => { setRunning(false); events.abort(); } };
+}
+
 /**
  * The statement scene, on black after the zoom: heading, the network box and the three
  * possibilities, as a paused GSAP timeline whose playhead is the hero's shared clock.
@@ -33,6 +78,7 @@ export function createSignalIntro(scene: HTMLElement) {
   const network = box.querySelector<HTMLElement>('[data-network]')!;
   const live = createSignalNetwork(box.querySelector<HTMLCanvasElement>('[data-network-canvas]')!);
   if (live) box.dataset.renderer = 'canvas';
+  const drift = createDrift(box);
 
   // Words rise out of their mask's baseline, and leave upward the same way. No blur.
   const below = { yPercent: 115, rotation: 4 };
@@ -94,6 +140,7 @@ export function createSignalIntro(scene: HTMLElement) {
       }
       cleared = true;
       live?.setRunning(false);
+      drift.setRunning(false);
       scene.dataset.phase = 'reduced';
       return;
     }
@@ -103,10 +150,17 @@ export function createSignalIntro(scene: HTMLElement) {
     timeline.time(progress);
     // The node wanders on its own clock while the box is on screen, even when scrolling stops.
     live?.setRunning(progress > 0.35 && progress < exit + 0.03);
+    // It floats from the moment its first edge is drawn, through the slide, until it leaves.
+    drift.setRunning(progress > 0.29 && progress < exit + 0.03);
     scene.dataset.progress = progress.toFixed(5);
     scene.dataset.phase = progress < 0.235 ? 'portal' : progress < 0.44 ? 'statement' : progress < 0.49 ? 'slide'
       : progress < exit ? ['process', 'identity', 'connection'][Math.min(2, Math.floor((progress - 0.49) / 0.07))] : 'signal';
   }
 
-  return { render, resize: () => live?.resize(), dispose: () => live?.dispose() };
+  function dispose() {
+    live?.dispose();
+    drift.dispose();
+  }
+
+  return { render, resize: () => live?.resize(), dispose };
 }
