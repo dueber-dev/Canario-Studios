@@ -130,7 +130,8 @@ export function mountSignalHero(hero: HTMLElement) {
     const arc = Math.sin(Math.PI * eased) * (1 - smooth(0.65, 1, t));
     const x = width / 2 + pointer.x * Math.min(56, width * 0.04) * arc + floatX;
     const y = height * (0.43 + 0.07 * eased) + pointer.y * 24 * arc + floatY;
-    const roll = 5 * smooth(0.03, 0.35, t) * (1 - smooth(0.55, 0.9, t)) + floatRoll;
+    // The diagonal belongs to the scroll zoom; the entry pull-back stays level.
+    const roll = 5 * smooth(0.03, 0.35, progress) * (1 - smooth(0.55, 0.9, progress)) + floatRoll;
     wordmark.setAttribute('transform', `translate(${x} ${y}) scale(${scale}) rotate(${roll}) translate(${-cx} ${-cy})`);
     field.style.opacity = String(1 - smooth(0.015, 0.28, zoom));
     const entered = t >= 1;
